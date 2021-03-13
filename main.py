@@ -51,21 +51,20 @@ class Player(arcade.Sprite):
         self.character_face_direction = RIGHT_FACING
         self.cur_texture = 0
         self.scale = CHARACTER_SCALING
-        self.player_choice = None
 
         # Track our state
         self.jumping = False
         self.climbing = False
         self.is_on_ladder = False
 
+        # self.player_choice = None Uncomment when choice is avaible
+        self.player_choice = 'M' #Temporal choice to male
 
-        self.player_choiche = "M" #Temporal choice to male
-
-        if self.player_choice == "M": # Male Choosen
+        if self.player_choice == 'M': # Male Choosen
             main_path = "images/player_M/male"
-        elif self.player_choice == "F": # Female Choosen
+        elif self.player_choice == 'F': # Female Choosen
             main_path = "images/player_F/female" 
-        elif self.player_choice == "Z": # Zombie Choosen
+        elif self.player_choice == 'Z': # Zombie Choosen
             main_path = "images/zombie/zombie"
         else: # Soldier Choosen
             main_path = "images/soldier/soldier"            
