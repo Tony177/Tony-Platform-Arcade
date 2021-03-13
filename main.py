@@ -9,14 +9,18 @@ SCREEN_HEIGHT = 1024
 SCREEN_TITLE = "Platform Game"
 
 # Constants used to scale the sprites from their original size
-CHARACTER_SCALING = 1
+CHARACTER_SCALING = 0.7
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 
 # Costant used to establish the player's sprite speed (pixel per frame)
-PLAYER_MOVEMENT_SPEED = 5
+PLAYER_MOVEMENT_SPEED = 3.5
 GRAVITY = 1
-PLAYER_JUMP_SPEED = 20
+PLAYER_JUMP_SPEED = 14
+
+# Map Starting Point
+PLAYER_START_X = 64
+PLAYER_START_Y = 192
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -24,6 +28,40 @@ LEFT_VIEWPORT_MARGIN = 300
 RIGHT_VIEWPORT_MARGIN = 700
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
+
+# Index of textures, first element faces left, second faces right
+TEXTURE_LEFT = 0
+TEXTURE_RIGHT = 1
+
+
+class Player(arcade.Sprite):
+
+    def __init__(self):
+        super().__init__()
+
+        self.scale = CHARACTER_SCALING
+        self.textures = []
+
+        # Load a left facing texture and a right facing texture.
+        # flipped_horizontally=True will mirror the image we load.
+        texture = arcade.load_texture(
+            "images/player_2/player_stand.png", flipped_horizontally=True)
+        self.textures.append(texture)
+        texture = arcade.load_texture("images/player_2/player_stand.png")
+        self.textures.append(texture)
+
+        # By default, face right.
+        self.texture = texture
+
+    def update(self):
+        self.center_x += self.change_x
+        self.center_y += self.change_y
+
+        # Figure out if we should face left or right
+        if self.change_x < 0:
+            self.texture = self.textures[TEXTURE_LEFT]
+        elif self.change_x > 0:
+            self.texture = self.textures[TEXTURE_RIGHT]
 
 
 class MyGame(arcade.Window):
@@ -37,55 +75,77 @@ class MyGame(arcade.Window):
         self.coin_list = None
         self.wall_list = None
         self.player_list = None
-
+        self.background_list = None
+        self.death_list = None
         # Separate variable that holds the player sprite
         self.player_sprite = None
+
+        # Keep track of the score
+        self.score = 0
 
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
 
-        arcade.set_background_color(arcade.csscolor.CYAN)
+        self.physics_engine = None
+        # Load sounds
+        self.collect_coin_sound = arcade.load_sound("sounds/coin1.wav")
+        self.jump_sound = arcade.load_sound("sounds/jump1.wav")
+        self.game_over = arcade.load_sound("sounds/gameover1.wav")
+        arcade.set_background_color(arcade.csscolor.SKY_BLUE)
 
     def setup(self):
         # This function permit the restart of the game
 
         # Create the Sprite lists
-        # The player move often so don't use Spatial Hash
-        self.player_list = arcade.SpriteList()
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         # Spatial hash speed up collision detection but slow down movement
-        self.coin_list = arcade.SpriteList(use_spatial_hash=True)
+        # The player move often so don't use Spatial Hash
 
-        # Set up the player, specifically placing it at these coordinates.
-        image_source = "images/player_2/player_stand.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
-        self.player_sprite.center_x = 64
-        self.player_sprite.center_y = 128
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
+        self.coin_list = arcade.SpriteList(use_spatial_hash=True)
+        self.death_list = arcade.SpriteList(use_spatial_hash=True)
+        self.background_list = arcade.SpriteList(use_spatial_hash=True)
+
+        # Keep track of the score
+        self.score = 0
+
+        # Set up the player
+        self.player_list = arcade.SpriteList()
+        self.player_sprite = Player()
+        self.player_sprite.center_x = PLAYER_START_X
+        self.player_sprite.center_y = PLAYER_START_Y
         self.player_list.append(self.player_sprite)
 
-        # Create the ground
-        # This shows using a loop to place multiple sprites horizontally
-        for x in range(0, 5*SCREEN_WIDTH, 64):
-            wall = arcade.Sprite("images/tiles/snowMid.png", TILE_SCALING)
-            wall.center_x = x
-            wall.center_y = 32
-            self.wall_list.append(wall)
+        # Name of map file to load
+        map_name = "maps/chapter1.tmx"
+        # Name of the layers
+        platforms_layer_name = 'Platforms'
+        coins_layer_name = 'Coins'
+        death_layer_name = 'Death'
+        background_layer_namer = 'Background'
 
-        # Put some crates on the ground
-        # This shows using a coordinate list to place sprites
-        coordinate_list = [[512, 96],
-                           [256, 96],
-                           [768, 96]]
+        # Read in the tiled map
+        my_map = arcade.tilemap.read_tmx(map_name)
 
-        for coordinate in coordinate_list:
-            # Add a crate on the ground
-            wall = arcade.Sprite(
-                ":resources:images/tiles/boxCrate_double.png", TILE_SCALING)
-            wall.position = coordinate
-            self.wall_list.append(wall)
+        # -- Platforms
+        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
+                                                      layer_name=platforms_layer_name,
+                                                      scaling=TILE_SCALING,
+                                                      use_spatial_hash=True)
 
-        # Adding the Physics Engine
+        # -- Coins
+        self.coin_list = arcade.tilemap.process_layer(
+            my_map, coins_layer_name, TILE_SCALING)
+        self.death_list = arcade.tilemap.process_layer(
+            my_map, death_layer_name, TILE_SCALING)
+        self.background_list = arcade.process_layer(
+            my_map, background_layer_namer, TILE_SCALING)
+        # --- Other stuff
+        # Set the background color
+        if my_map.background_color:
+            arcade.set_background_color(my_map.background_color)
+
+        # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
                                                              self.wall_list,
                                                              GRAVITY)
@@ -94,10 +154,18 @@ class MyGame(arcade.Window):
         # Render the game
 
         arcade.start_render()
+
         # Code to draw the screen goes here
         self.wall_list.draw()
         self.coin_list.draw()
         self.player_list.draw()
+        self.background_list.draw()
+        self.death_list.draw()
+
+        # Draw our score on the screen, scrolling it with the viewport
+        score_text = f"Score: {self.score}"
+        arcade.draw_text(score_text, 10 + self.view_left, SCREEN_HEIGHT-50,
+                         arcade.csscolor.WHITE, 36)
 
     def on_key_press(self, key, modifiers):
         # Called when a key is pressed
@@ -105,6 +173,7 @@ class MyGame(arcade.Window):
         if key == arcade.key.UP or key == arcade.key.W:
             if self.physics_engine.can_jump():
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
+                arcade.play_sound(self.jump_sound)
         elif key == arcade.key.LEFT or key == arcade.key.A:
             self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.RIGHT or key == arcade.key.D:
@@ -119,10 +188,31 @@ class MyGame(arcade.Window):
             self.player_sprite.change_x = 0
 
     def on_update(self, delta_time):
+        # Faces sprite texture left or right
+        self.player_sprite.update()
         # Physics engine movemente logic
 
         self.physics_engine.update()
+        # See if hit any coins
+        coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
+                                                             self.coin_list)
+        # Loop through each coin we hit (if any), remove it and play a sound
+        for coin in coin_hit_list:
+            coin.remove_from_sprite_lists()
+            self.score += 1
+            arcade.play_sound(self.collect_coin_sound)
 
+        if (arcade.check_for_collision_with_list(self.player_sprite, self.death_list) or self.player_sprite.center_y < -100):
+            self.player_sprite.change_x = 0
+            self.player_sprite.change_y = 0
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
+
+            # Set the camera to the start
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
+            arcade.play_sound(self.game_over)
         # Track if we need to change the viewport
         changed = False
 

@@ -6,6 +6,9 @@ Simple platform game created for educational purpose.
 The game has the following implemented features:
 - Movement and Physics Engine
 - First chapter
+- Death object
+- Simple sound (picking coin and death)
+- Multiple layer map 
 
 Yet to be implemented:
 - Other chapter (still unknown number)
