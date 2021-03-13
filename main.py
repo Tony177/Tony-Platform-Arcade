@@ -1,4 +1,4 @@
-# Creating the game's window
+
 # Author : Tony177
 
 import arcade
@@ -30,38 +30,110 @@ BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 100
 
 # Index of textures, first element faces left, second faces right
-TEXTURE_LEFT = 0
-TEXTURE_RIGHT = 1
+RIGHT_FACING = 0
+LEFT_FACING = 1
 
+def load_texture_pair(filename):
 
+    return [
+        arcade.load_texture(filename),
+        arcade.load_texture(filename, flipped_horizontally=True)
+        ]
+
+        
 class Player(arcade.Sprite):
+
 
     def __init__(self):
         super().__init__()
 
+        # Default texture
+        self.character_face_direction = RIGHT_FACING
+        self.cur_texture = 0
         self.scale = CHARACTER_SCALING
-        self.textures = []
+        self.player_choice = None
 
+        # Track our state
+        self.jumping = False
+        self.climbing = False
+        self.is_on_ladder = False
+
+
+        self.player_choiche = "M" #Temporal choice to male
+
+        if self.player_choice == "M": # Male Choosen
+            main_path = "images/player_M/male"
+        elif self.player_choice == "F": # Female Choosen
+            main_path = "images/player_F/female" 
+        elif self.player_choice == "Z": # Zombie Choosen
+            main_path = "images/zombie/zombie"
+        else: # Soldier Choosen
+            main_path = "images/soldier/soldier"            
+
+        # Loading idle, jump and fall texture
+        self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
+        self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")
+        self.fall_texture_pair = load_texture_pair(f"{main_path}_fall.png")
         # Load a left facing texture and a right facing texture.
-        # flipped_horizontally=True will mirror the image we load.
-        texture = arcade.load_texture(
-            "images/player_2/player_stand.png", flipped_horizontally=True)
-        self.textures.append(texture)
-        texture = arcade.load_texture("images/player_2/player_stand.png")
-        self.textures.append(texture)
+        
+        
+        # Load textures for walking
+        self.walk_textures = []
+        texture = load_texture_pair(f"{main_path}_idle.png")
+        self.walk_textures.append(texture)
+        for i in range(1,3):
+            texture = load_texture_pair(f"{main_path}_walk{i}.png")
+            self.walk_textures.append(texture)
 
-        # By default, face right.
-        self.texture = texture
+        # Load textures for climbing
+        self.climbing_textures = []
+        for i in range(1,3):
+            texture = arcade.load_texture(f"{main_path}_climb{i}.png")
+            self.climbing_textures.append(texture)
 
-    def update(self):
-        self.center_x += self.change_x
-        self.center_y += self.change_y
+        # Set the initial texture
+        self.texture = self.idle_texture_pair[0]
+        self.set_hit_box(self.texture.hit_box_points)
 
-        # Figure out if we should face left or right
-        if self.change_x < 0:
-            self.texture = self.textures[TEXTURE_LEFT]
-        elif self.change_x > 0:
-            self.texture = self.textures[TEXTURE_RIGHT]
+    def update_animation(self, delta_time):
+
+        # Figure out if we need to flip face left or right
+        if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
+            self.character_face_direction = LEFT_FACING
+        elif self.change_x > 0 and self.character_face_direction == LEFT_FACING:
+            self.character_face_direction = RIGHT_FACING
+
+        # Climbing animation
+        if self.is_on_ladder:
+            self.climbing = True
+        if not self.is_on_ladder and self.climbing:
+            self.climbing = False
+        if self.climbing and abs(self.change_y) > 1:
+            self.cur_texture += 1
+            if self.cur_texture > 2:
+                self.cur_texture = 0
+        if self.climbing:
+            self.texture = self.climbing_textures[self.cur_texture // 2]
+            return
+
+        # Jumping animation
+        if self.change_y > 0 and not self.is_on_ladder:
+            self.texture = self.jump_texture_pair[self.character_face_direction]
+            return
+        elif self.change_y < 0 and not self.is_on_ladder:
+            self.texture = self.fall_texture_pair[self.character_face_direction]
+            return
+
+        # Idle animation
+        if self.change_x == 0:
+            self.texture = self.idle_texture_pair[self.character_face_direction]
+            return
+
+        # Walking animation
+        self.cur_texture += 1
+        if self.cur_texture > 2:
+            self.cur_texture = 0
+        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 
 class MyGame(arcade.Window):
@@ -86,16 +158,30 @@ class MyGame(arcade.Window):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
+        self.end_map = 0
+
+        # Track the current state of what key is pressed
+        self.left_pressed = False
+        self.right_pressed = False
+        self.up_pressed = False
+        self.down_pressed = False
+        self.jump_needs_reset = False
 
         self.physics_engine = None
+        
         # Load sounds
         self.collect_coin_sound = arcade.load_sound("sounds/coin1.wav")
         self.jump_sound = arcade.load_sound("sounds/jump1.wav")
         self.game_over = arcade.load_sound("sounds/gameover1.wav")
+        
         arcade.set_background_color(arcade.csscolor.SKY_BLUE)
 
     def setup(self):
         # This function permit the restart of the game
+
+        # Used to keep track of our scrolling
+        self.view_bottom = 0
+        self.view_left = 0
 
         # Create the Sprite lists
         # Spatial hash speed up collision detection but slow down movement
@@ -167,32 +253,101 @@ class MyGame(arcade.Window):
         arcade.draw_text(score_text, 10 + self.view_left, SCREEN_HEIGHT-50,
                          arcade.csscolor.WHITE, 36)
 
+    def process_keychange(self):
+
+        # Process up/down
+        if self.up_pressed and not self.down_pressed:
+            if self.physics_engine.is_on_ladder():
+                self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+            elif self.physics_engine.can_jump(y_distance=10) and not self.jump_needs_reset:
+                self.player_sprite.change_y = PLAYER_JUMP_SPEED
+                self.jump_needs_reset = True
+                arcade.play_sound(self.jump_sound)
+        elif self.down_pressed and not self.up_pressed:
+            if self.physics_engine.is_on_ladder():
+                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+
+        # Process up/down when on a ladder and no movement
+        if self.physics_engine.is_on_ladder():
+            if not self.up_pressed and not self.down_pressed:
+                self.player_sprite.change_y = 0
+            elif self.up_pressed and self.down_pressed:
+                self.player_sprite.change_y = 0
+
+        # Process left/right
+        if self.right_pressed and not self.left_pressed:
+            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+        elif self.left_pressed and not self.right_pressed:
+            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+        else:
+            self.player_sprite.change_x = 0
+
     def on_key_press(self, key, modifiers):
         # Called when a key is pressed
 
         if key == arcade.key.UP or key == arcade.key.W:
-            if self.physics_engine.can_jump():
-                self.player_sprite.change_y = PLAYER_JUMP_SPEED
-                arcade.play_sound(self.jump_sound)
+            self.up_pressed = True
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.down_pressed = True
         elif key == arcade.key.LEFT or key == arcade.key.A:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+            self.left_pressed = True
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+            self.right_pressed = True
+
+        self.process_keychange()
 
     def on_key_release(self, key, modifiers):
         # Called when a key is released
 
-        if key == arcade.key.LEFT or key == arcade.key.A:
-            self.player_sprite.change_x = 0
+        if key == arcade.key.UP or key == arcade.key.W:
+            self.up_pressed = False
+            self.jump_needs_reset = False
+        elif key == arcade.key.DOWN or key == arcade.key.S:
+            self.down_pressed = False
+        elif key == arcade.key.LEFT or key == arcade.key.A:
+            self.left_pressed = False
         elif key == arcade.key.RIGHT or key == arcade.key.D:
-            self.player_sprite.change_x = 0
+            self.right_pressed = False
+
+        self.process_keychange()
 
     def on_update(self, delta_time):
-        # Faces sprite texture left or right
-        self.player_sprite.update()
-        # Physics engine movemente logic
 
+        # Move the player with the physics engine
         self.physics_engine.update()
+
+        # Update animations
+        if self.physics_engine.can_jump():
+            self.player_sprite.can_jump = False
+        else:
+            self.player_sprite.can_jump = True
+
+        if self.physics_engine.is_on_ladder() and not self.physics_engine.can_jump():
+            self.player_sprite.is_on_ladder = True
+            self.process_keychange()
+        else:
+            self.player_sprite.is_on_ladder = False
+            self.process_keychange()
+
+        self.coin_list.update_animation(delta_time)
+        self.background_list.update_animation(delta_time)
+        self.player_list.update_animation(delta_time)
+
+        # Update walls, used with moving platforms
+        self.wall_list.update()
+
+        # See if the moving wall hit a boundary and needs to reverse direction.
+        for wall in self.wall_list:
+
+            if wall.boundary_right and wall.right > wall.boundary_right and wall.change_x > 0:
+                wall.change_x *= -1
+            if wall.boundary_left and wall.left < wall.boundary_left and wall.change_x < 0:
+                wall.change_x *= -1
+            if wall.boundary_top and wall.top > wall.boundary_top and wall.change_y > 0:
+                wall.change_y *= -1
+            if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
+                wall.change_y *= -1
+
         # See if hit any coins
         coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
                                                              self.coin_list)

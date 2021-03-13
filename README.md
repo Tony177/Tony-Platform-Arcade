@@ -3,18 +3,19 @@ Simple platform game created for educational purpose.
 
 ## Structure of the game
 
-The game has the following implemented features:
-- Movement and Physics Engine
-- First chapter
-- Death object
-- Simple sound (picking coin and death)
-- Multiple layer map 
-
-Yet to be implemented:
-- Other chapter (still unknown number)
-- Enemies
-- General Objective of the game
-- Simple animation of the images
+Game's Feature to implement/implemented:
+- Movement and Physics Engine :heavy_check_mark:
+- First chapter :heavy_check_mark:
+- Death object :heavy_check_mark:
+- Simple sound (picking coin and death) :heavy_check_mark:
+- Multiple layer map :heavy_check_mark:
+- Other chapter (still unknown number) :x:
+- Enemies :x:
+- Background Music :x:
+- General Objective of the game :x:
+- Simple animation of the images :heavy_check_mark:
+- Multiple Characters :x:
+- Starting and Ending view :x:
 
 Ideas:
 - Add some kind of lore
