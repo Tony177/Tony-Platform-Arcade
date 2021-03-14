@@ -13,14 +13,19 @@ CHARACTER_SCALING = 0.8
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 
-# Costant used to establish the player's sprite speed (pixel per frame)
+# Costant used to establish the player's sprite speed and status(pixel per frame)
 PLAYER_MOVEMENT_SPEED = 3.5
 GRAVITY = 1
 PLAYER_JUMP_SPEED = 16
 
+# 0 Male - 1 Female - 2 Zombie - 3 Soldier
+PLAYER_SPRITE = 0
+
 # Map Starting Point
 PLAYER_START_X = 64
 PLAYER_START_Y = 192
+
+DEFAULT_VOLUME = 0.6
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -57,17 +62,16 @@ class Player(arcade.Sprite):
         self.climbing = False
         self.is_on_ladder = False
 
-        # self.player_choice = None Uncomment when choice is avaible
-        self.player_choice = 'M'  # Temporal choice to male
-
-        if self.player_choice == 'M':  # Male Choosen
+        if PLAYER_SPRITE == 0:  # Male Choosen
             main_path = "images/player_M/male"
-        elif self.player_choice == 'F':  # Female Choosen
+        elif PLAYER_SPRITE == 1:  # Female Choosen
             main_path = "images/player_F/female"
-        elif self.player_choice == 'Z':  # Zombie Choosen
+        elif PLAYER_SPRITE == 2:  # Zombie Choosen
             main_path = "images/zombie/zombie"
-        else:  # Soldier Choosen
+        elif PLAYER_SPRITE == 3:  # Soldier Choosen
             main_path = "images/soldier/soldier"
+        else:
+            print("Error loading player texture")
 
         # Loading idle, jump and fall texture
         self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
@@ -229,7 +233,7 @@ class GameView(arcade.View):
         self.lifes = 3
 
         # Start background music
-        self.backgroud_sound.play(loop=True)
+        self.backgroud_sound.play(0.6,loop=True)
 
         # Set up the player
         self.player_list = arcade.SpriteList()
@@ -302,7 +306,7 @@ class GameView(arcade.View):
             elif self.physics_engine.can_jump(y_distance=10) and not self.jump_needs_reset:
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 self.jump_needs_reset = True
-                arcade.play_sound(self.jump_sound)
+                arcade.play_sound(DEFAULT_VOLUME, self.jump_sound)
         elif self.down_pressed and not self.up_pressed:
             if self.physics_engine.is_on_ladder():
                 self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
@@ -395,7 +399,7 @@ class GameView(arcade.View):
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
             self.coins += 1
-            arcade.play_sound(self.collect_coin_sound)
+            arcade.play_sound(DEFAULT_VOLUME, self.collect_coin_sound)
             if self.coins >= 100:
                 self.coins -= 100
                 self.lifes += 1
@@ -415,7 +419,7 @@ class GameView(arcade.View):
                 self.view_left = 0
                 self.view_bottom = 0
                 changed = True
-                arcade.play_sound(self.game_over)
+                arcade.play_sound(DEFAULT_VOLUME, self.game_over)
         # Track if we need to change the viewport
         changed = False
 
