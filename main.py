@@ -33,16 +33,16 @@ TOP_VIEWPORT_MARGIN = 100
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
+
 def load_texture_pair(filename):
 
     return [
         arcade.load_texture(filename),
         arcade.load_texture(filename, flipped_horizontally=True)
-        ]
+    ]
 
-        
+
 class Player(arcade.Sprite):
-
 
     def __init__(self):
         super().__init__()
@@ -58,35 +58,34 @@ class Player(arcade.Sprite):
         self.is_on_ladder = False
 
         # self.player_choice = None Uncomment when choice is avaible
-        self.player_choice = 'M' #Temporal choice to male
+        self.player_choice = 'M'  # Temporal choice to male
 
-        if self.player_choice == 'M': # Male Choosen
+        if self.player_choice == 'M':  # Male Choosen
             main_path = "images/player_M/male"
-        elif self.player_choice == 'F': # Female Choosen
-            main_path = "images/player_F/female" 
-        elif self.player_choice == 'Z': # Zombie Choosen
+        elif self.player_choice == 'F':  # Female Choosen
+            main_path = "images/player_F/female"
+        elif self.player_choice == 'Z':  # Zombie Choosen
             main_path = "images/zombie/zombie"
-        else: # Soldier Choosen
-            main_path = "images/soldier/soldier"            
+        else:  # Soldier Choosen
+            main_path = "images/soldier/soldier"
 
         # Loading idle, jump and fall texture
         self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
         self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")
         self.fall_texture_pair = load_texture_pair(f"{main_path}_fall.png")
         # Load a left facing texture and a right facing texture.
-        
-        
+
         # Load textures for walking
         self.walk_textures = []
         texture = load_texture_pair(f"{main_path}_idle.png")
         self.walk_textures.append(texture)
-        for i in range(1,3):
+        for i in range(1, 3):
             texture = load_texture_pair(f"{main_path}_walk{i}.png")
             self.walk_textures.append(texture)
 
         # Load textures for climbing
         self.climbing_textures = []
-        for i in range(1,3):
+        for i in range(1, 3):
             texture = arcade.load_texture(f"{main_path}_climb{i}.png")
             self.climbing_textures.append(texture)
 
@@ -134,6 +133,7 @@ class Player(arcade.Sprite):
             self.cur_texture = 0
         self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
+
 class StartingView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -148,16 +148,19 @@ class StartingView(arcade.View):
         start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
         start_text_begin = "Click with the mouse to start character selection"
-        arcade.draw_text(start_text_title, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+350, arcade.csscolor.WHITE,anchor_x="center", anchor_y="top",align="center", font_size=72)
-        arcade.draw_text(start_text_body,SCREEN_WIDTH/2, SCREEN_HEIGHT/2+100, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=32)
-        arcade.draw_text(start_text_end,SCREEN_WIDTH/2, SCREEN_HEIGHT/2-100, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=32)
-        arcade.draw_text(start_text_begin,SCREEN_WIDTH/2, SCREEN_HEIGHT/2-200, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=48)
-   
-    def on_mouse_press(self, _x , _y, _button, _modifiers):
+        arcade.draw_text(start_text_title, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+350,
+                         arcade.csscolor.WHITE, anchor_x="center", anchor_y="top", align="center", font_size=72)
+        arcade.draw_text(start_text_body, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+100, arcade.csscolor.WHITE,
+                         anchor_x="center", anchor_y="center", align="center", font_size=32)
+        arcade.draw_text(start_text_end, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-100, arcade.csscolor.WHITE,
+                         anchor_x="center", anchor_y="center", align="center", font_size=32)
+        arcade.draw_text(start_text_begin, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-200, arcade.csscolor.WHITE,
+                         anchor_x="center", anchor_y="center", align="center", font_size=48)
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
         game_view = GameView()
         game_view.setup()
         self.window.show_view(game_view)
-        
 
 
 class GameView(arcade.View):
@@ -178,7 +181,8 @@ class GameView(arcade.View):
         self.player_sprite = None
 
         # Keep track of the score
-        self.score = 0
+        self.coins = 0
+        self.lifes = 3
 
         # Used to keep track of our scrolling
         self.view_bottom = 0
@@ -193,12 +197,15 @@ class GameView(arcade.View):
         self.jump_needs_reset = False
 
         self.physics_engine = None
-        
+
         # Load sounds
-        self.collect_coin_sound = arcade.load_sound("sounds/coin1.wav")
+        self.collect_coin_sound = arcade.load_sound("sounds/coin2.wav")
         self.jump_sound = arcade.load_sound("sounds/jump1.wav")
-        self.game_over = arcade.load_sound("sounds/gameover1.wav")
-        
+        self.game_over = arcade.load_sound("sounds/gameover3.wav")
+
+        # Load the background music for game view
+        self.backgroud_sound = arcade.load_sound("musics/funkyrobot.mp3")
+
         arcade.set_background_color(arcade.csscolor.SKY_BLUE)
 
     def setup(self):
@@ -218,7 +225,11 @@ class GameView(arcade.View):
         self.background_list = arcade.SpriteList(use_spatial_hash=True)
 
         # Keep track of the score
-        self.score = 0
+        self.coins = 0
+        self.lifes = 3
+
+        # Start background music
+        self.backgroud_sound.play(loop=True)
 
         # Set up the player
         self.player_list = arcade.SpriteList()
@@ -273,10 +284,14 @@ class GameView(arcade.View):
         self.background_list.draw()
         self.death_list.draw()
 
-        # Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score: {self.score}"
-        arcade.draw_text(score_text, 10 + self.view_left, SCREEN_HEIGHT-50,
+        # Draw coins on the screen, scrolling it with the viewport
+        coins_text = f"Coins: {self.coins}"
+        arcade.draw_text(coins_text, 10 + self.view_left, SCREEN_HEIGHT-50,
                          arcade.csscolor.WHITE, 36)
+        # Draw lifes left, scrolling it with the viewport
+        lifes_text = f"Lifes: {self.lifes}"
+        arcade.draw_text(lifes_text, 10 + self.view_left,
+                         SCREEN_HEIGHT - 100, arcade.csscolor.WHITE, 36)
 
     def process_keychange(self):
 
@@ -379,20 +394,28 @@ class GameView(arcade.View):
         # Loop through each coin we hit (if any), remove it and play a sound
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
-            self.score += 1
+            self.coins += 1
             arcade.play_sound(self.collect_coin_sound)
+            if self.coins >= 100:
+                self.coins -= 100
+                self.lifes += 1
 
         if (arcade.check_for_collision_with_list(self.player_sprite, self.death_list) or self.player_sprite.center_y < -100):
-            self.player_sprite.change_x = 0
-            self.player_sprite.change_y = 0
-            self.player_sprite.center_x = PLAYER_START_X
-            self.player_sprite.center_y = PLAYER_START_Y
+            self.lifes-=1
+            if(self.lifes == 0):
+                #TO BE DONE: Implement death view
+                pass
+            else:
+                self.player_sprite.change_x = 0
+                self.player_sprite.change_y = 0
+                self.player_sprite.center_x = PLAYER_START_X
+                self.player_sprite.center_y = PLAYER_START_Y
 
-            # Set the camera to the start
-            self.view_left = 0
-            self.view_bottom = 0
-            changed = True
-            arcade.play_sound(self.game_over)
+                # Set the camera to the start
+                self.view_left = 0
+                self.view_bottom = 0
+                changed = True
+                arcade.play_sound(self.game_over)
         # Track if we need to change the viewport
         changed = False
 
