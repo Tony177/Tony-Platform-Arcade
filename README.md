@@ -15,7 +15,8 @@ Game's Feature to implement/implemented:
 - General Objective of the game :x:
 - Simple animation of the images :heavy_check_mark:
 - Multiple Characters :x:
-- Starting and Ending view :x:
+- Starting View :heavy_check_mark:
+- Ending View :x:
 
 Ideas:
 - Add some kind of lore

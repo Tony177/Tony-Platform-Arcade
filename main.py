@@ -9,14 +9,14 @@ SCREEN_HEIGHT = 1024
 SCREEN_TITLE = "Platform Game"
 
 # Constants used to scale the sprites from their original size
-CHARACTER_SCALING = 0.7
+CHARACTER_SCALING = 0.8
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 
 # Costant used to establish the player's sprite speed (pixel per frame)
 PLAYER_MOVEMENT_SPEED = 3.5
 GRAVITY = 1
-PLAYER_JUMP_SPEED = 14
+PLAYER_JUMP_SPEED = 16
 
 # Map Starting Point
 PLAYER_START_X = 64
@@ -134,12 +134,38 @@ class Player(arcade.Sprite):
             self.cur_texture = 0
         self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
+class StartingView(arcade.View):
+    def __init__(self):
+        super().__init__()
 
-class MyGame(arcade.Window):
+    def on_show(self):
+        arcade.set_background_color(arcade.csscolor.DARK_RED)
+        arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+
+    def on_draw(self):
+        arcade.start_render()
+        start_text_title = "Instruction to play:"
+        start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
+        start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
+        start_text_begin = "Click with the mouse to start character selection"
+        arcade.draw_text(start_text_title, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+350, arcade.csscolor.WHITE,anchor_x="center", anchor_y="top",align="center", font_size=72)
+        arcade.draw_text(start_text_body,SCREEN_WIDTH/2, SCREEN_HEIGHT/2+100, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=32)
+        arcade.draw_text(start_text_end,SCREEN_WIDTH/2, SCREEN_HEIGHT/2-100, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=32)
+        arcade.draw_text(start_text_begin,SCREEN_WIDTH/2, SCREEN_HEIGHT/2-200, arcade.csscolor.WHITE, anchor_x="center", anchor_y="center",align="center", font_size=48)
+   
+    def on_mouse_press(self, _x , _y, _button, _modifiers):
+        game_view = GameView()
+        game_view.setup()
+        self.window.show_view(game_view)
+        
+
+
+class GameView(arcade.View):
     def __init__(self):
 
         # Call the parent class and set up the window
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__()
+        self.window.set_mouse_visible(False)
 
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
@@ -408,8 +434,10 @@ class MyGame(arcade.Window):
 
 
 def main():
-    window = MyGame()
-    window.setup()
+
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    star_view = StartingView()
+    window.show_view(star_view)
     arcade.run()
 
 
