@@ -14,9 +14,12 @@ Game's Feature to implement/implemented:
 - Background Music :heavy_check_mark:
 - General Objective of the game :x:
 - Simple animation of the images :heavy_check_mark:
-- Selection of various characters :x:
+- Selection of various characters :heavy_check_mark:
 - Starting View :heavy_check_mark:
-- Ending View :x:
+- Game Over View :x:
+- Moving Platform :x:
+- Level Menu :x:
+- Pause Menu (ESC) :x: 
 
 Ideas:
 - Add some kind of lore

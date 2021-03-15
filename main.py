@@ -1,4 +1,3 @@
-
 # Author : Tony177
 
 import arcade
@@ -43,12 +42,11 @@ def load_texture_pair(filename):
 
     return [
         arcade.load_texture(filename),
-        arcade.load_texture(filename, flipped_horizontally=True)
+        arcade.load_texture(filename, flipped_horizontally=True),
     ]
 
 
 class Player(arcade.Sprite):
-
     def __init__(self):
         super().__init__()
 
@@ -135,7 +133,9 @@ class Player(arcade.Sprite):
         self.cur_texture += 1
         if self.cur_texture > 2:
             self.cur_texture = 0
-        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+        self.texture = self.walk_textures[self.cur_texture][
+            self.character_face_direction
+        ]
 
 
 class StartingView(arcade.View):
@@ -152,19 +152,120 @@ class StartingView(arcade.View):
         start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
         start_text_begin = "Click with the mouse to start character selection"
-        arcade.draw_text(start_text_title, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+350,
-                         arcade.csscolor.WHITE, anchor_x="center", anchor_y="top", align="center", font_size=72)
-        arcade.draw_text(start_text_body, SCREEN_WIDTH/2, SCREEN_HEIGHT/2+100, arcade.csscolor.WHITE,
-                         anchor_x="center", anchor_y="center", align="center", font_size=32)
-        arcade.draw_text(start_text_end, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-100, arcade.csscolor.WHITE,
-                         anchor_x="center", anchor_y="center", align="center", font_size=32)
-        arcade.draw_text(start_text_begin, SCREEN_WIDTH/2, SCREEN_HEIGHT/2-200, arcade.csscolor.WHITE,
-                         anchor_x="center", anchor_y="center", align="center", font_size=48)
+        arcade.draw_text(
+            start_text_title,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 + 350,
+            arcade.csscolor.WHITE,
+            anchor_x="center",
+            anchor_y="top",
+            align="center",
+            font_size=72,
+        )
+        arcade.draw_text(
+            start_text_body,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 + 100,
+            arcade.csscolor.WHITE,
+            anchor_x="center",
+            anchor_y="center",
+            align="center",
+            font_size=32,
+        )
+        arcade.draw_text(
+            start_text_end,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 - 100,
+            arcade.csscolor.WHITE,
+            anchor_x="center",
+            anchor_y="center",
+            align="center",
+            font_size=32,
+        )
+        arcade.draw_text(
+            start_text_begin,
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 - 200,
+            arcade.csscolor.WHITE,
+            anchor_x="center",
+            anchor_y="center",
+            align="center",
+            font_size=48,
+        )
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        game_view = GameView()
-        game_view.setup()
-        self.window.show_view(game_view)
+        character_view = CharacterView()
+        character_view.setup()
+        self.window.show_view(character_view)
+
+
+class CharacterView(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+    def setup(self):
+        # Adding all idle textures to a list of textures
+
+        X_LEFT = SCREEN_WIDTH * 1 / 4
+        X_RIGHT = SCREEN_WIDTH * 3 / 4
+        Y_BOTTOM = SCREEN_HEIGHT * 1 / 4
+        Y_TOP = SCREEN_HEIGHT * 3 / 4
+        self.sprites = []
+        self.sprites.append(
+            arcade.Sprite(
+                "images/player_M/male_idle.png",
+                scale=2,
+                center_x=X_LEFT,
+                center_y=Y_TOP,
+            )
+        )
+        self.sprites.append(
+            arcade.Sprite(
+                "images/player_F/female_idle.png",
+                scale=2,
+                center_x=X_RIGHT,
+                center_y=Y_TOP,
+            )
+        )
+        self.sprites.append(
+            arcade.Sprite(
+                "images/zombie/zombie_idle.png",
+                scale=2,
+                center_x=X_LEFT,
+                center_y=Y_BOTTOM,
+            )
+        )
+        self.sprites.append(
+            arcade.Sprite(
+                "images/soldier/soldier_idle.png",
+                scale=2,
+                center_x=X_RIGHT,
+                center_y=Y_BOTTOM,
+            )
+        )
+
+    def on_show(self):
+        arcade.set_background_color(arcade.csscolor.DARK_RED)
+        arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+
+    def on_draw(self):
+        arcade.start_render()
+
+        for x in self.sprites:
+            x.draw()
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        global PLAYER_SPRITE
+        i = 0
+
+        for sprite in self.sprites:
+            if _x > sprite.left and _x < sprite.left + sprite.width:
+                if _y > sprite.bottom and _y < sprite.bottom + sprite.height:
+                    PLAYER_SPRITE = i
+                    game_view = GameView()
+                    game_view.setup()
+                    self.window.show_view(game_view)
+            i += 1
 
 
 class GameView(arcade.View):
@@ -223,17 +324,17 @@ class GameView(arcade.View):
         # Spatial hash speed up collision detection but slow down movement
         # The player move often so don't use Spatial Hash
 
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True)
-        self.coin_list = arcade.SpriteList(use_spatial_hash=True)
-        self.death_list = arcade.SpriteList(use_spatial_hash=True)
-        self.background_list = arcade.SpriteList(use_spatial_hash=True)
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.coin_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.death_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.background_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
 
         # Keep track of the score
         self.coins = 0
         self.lifes = 3
 
         # Start background music
-        self.backgroud_sound.play(0.6,loop=True)
+        self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
 
         # Set up the player
         self.player_list = arcade.SpriteList()
@@ -245,36 +346,41 @@ class GameView(arcade.View):
         # Name of map file to load
         map_name = "maps/chapter1.tmx"
         # Name of the layers
-        platforms_layer_name = 'Platforms'
-        coins_layer_name = 'Coins'
-        death_layer_name = 'Death'
-        background_layer_namer = 'Background'
+        platforms_layer_name = "Platforms"
+        coins_layer_name = "Coins"
+        death_layer_name = "Death"
+        background_layer_namer = "Background"
 
         # Read in the tiled map
         my_map = arcade.tilemap.read_tmx(map_name)
 
         # -- Platforms
-        self.wall_list = arcade.tilemap.process_layer(map_object=my_map,
-                                                      layer_name=platforms_layer_name,
-                                                      scaling=TILE_SCALING,
-                                                      use_spatial_hash=True)
+        self.wall_list = arcade.tilemap.process_layer(
+            map_object=my_map,
+            layer_name=platforms_layer_name,
+            scaling=TILE_SCALING,
+            sl_hash=True,
+        )
 
         # -- Coins
         self.coin_list = arcade.tilemap.process_layer(
-            my_map, coins_layer_name, TILE_SCALING)
+            my_map, coins_layer_name, TILE_SCALING
+        )
         self.death_list = arcade.tilemap.process_layer(
-            my_map, death_layer_name, TILE_SCALING)
+            my_map, death_layer_name, TILE_SCALING
+        )
         self.background_list = arcade.process_layer(
-            my_map, background_layer_namer, TILE_SCALING)
+            my_map, background_layer_namer, TILE_SCALING
+        )
         # --- Other stuff
         # Set the background color
         if my_map.background_color:
             arcade.set_background_color(my_map.background_color)
 
         # Create the 'physics engine'
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player_sprite,
-                                                             self.wall_list,
-                                                             GRAVITY)
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player_sprite, self.wall_list, GRAVITY
+        )
 
     def on_draw(self):
         # Render the game
@@ -290,12 +396,22 @@ class GameView(arcade.View):
 
         # Draw coins on the screen, scrolling it with the viewport
         coins_text = f"Coins: {self.coins}"
-        arcade.draw_text(coins_text, 10 + self.view_left, SCREEN_HEIGHT-50,
-                         arcade.csscolor.WHITE, 36)
+        arcade.draw_text(
+            coins_text,
+            10 + self.view_left,
+            SCREEN_HEIGHT - 50,
+            arcade.csscolor.WHITE,
+            36,
+        )
         # Draw lifes left, scrolling it with the viewport
         lifes_text = f"Lifes: {self.lifes}"
-        arcade.draw_text(lifes_text, 10 + self.view_left,
-                         SCREEN_HEIGHT - 100, arcade.csscolor.WHITE, 36)
+        arcade.draw_text(
+            lifes_text,
+            10 + self.view_left,
+            SCREEN_HEIGHT - 100,
+            arcade.csscolor.WHITE,
+            36,
+        )
 
     def process_keychange(self):
 
@@ -303,10 +419,13 @@ class GameView(arcade.View):
         if self.up_pressed and not self.down_pressed:
             if self.physics_engine.is_on_ladder():
                 self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
-            elif self.physics_engine.can_jump(y_distance=10) and not self.jump_needs_reset:
+            elif (
+                self.physics_engine.can_jump(y_distance=10)
+                and not self.jump_needs_reset
+            ):
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 self.jump_needs_reset = True
-                arcade.play_sound(DEFAULT_VOLUME, self.jump_sound)
+                arcade.play_sound(self.jump_sound, DEFAULT_VOLUME)
         elif self.down_pressed and not self.up_pressed:
             if self.physics_engine.is_on_ladder():
                 self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
@@ -383,31 +502,47 @@ class GameView(arcade.View):
         # See if the moving wall hit a boundary and needs to reverse direction.
         for wall in self.wall_list:
 
-            if wall.boundary_right and wall.right > wall.boundary_right and wall.change_x > 0:
+            if (
+                wall.boundary_right
+                and wall.right > wall.boundary_right
+                and wall.change_x > 0
+            ):
                 wall.change_x *= -1
-            if wall.boundary_left and wall.left < wall.boundary_left and wall.change_x < 0:
+            if (
+                wall.boundary_left
+                and wall.left < wall.boundary_left
+                and wall.change_x < 0
+            ):
                 wall.change_x *= -1
             if wall.boundary_top and wall.top > wall.boundary_top and wall.change_y > 0:
                 wall.change_y *= -1
-            if wall.boundary_bottom and wall.bottom < wall.boundary_bottom and wall.change_y < 0:
+            if (
+                wall.boundary_bottom
+                and wall.bottom < wall.boundary_bottom
+                and wall.change_y < 0
+            ):
                 wall.change_y *= -1
 
         # See if hit any coins
-        coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
-                                                             self.coin_list)
+        coin_hit_list = arcade.check_for_collision_with_list(
+            self.player_sprite, self.coin_list
+        )
         # Loop through each coin we hit (if any), remove it and play a sound
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
             self.coins += 1
-            arcade.play_sound(DEFAULT_VOLUME, self.collect_coin_sound)
+            arcade.play_sound(self.collect_coin_sound, DEFAULT_VOLUME)
             if self.coins >= 100:
                 self.coins -= 100
                 self.lifes += 1
 
-        if (arcade.check_for_collision_with_list(self.player_sprite, self.death_list) or self.player_sprite.center_y < -100):
-            self.lifes-=1
-            if(self.lifes == 0):
-                #TO BE DONE: Implement death view
+        if (
+            arcade.check_for_collision_with_list(self.player_sprite, self.death_list)
+            or self.player_sprite.center_y < -100
+        ):
+            self.lifes -= 1
+            if self.lifes == 0:
+                # TO BE DONE: Implement death view
                 pass
             else:
                 self.player_sprite.change_x = 0
@@ -419,7 +554,7 @@ class GameView(arcade.View):
                 self.view_left = 0
                 self.view_bottom = 0
                 changed = True
-                arcade.play_sound(DEFAULT_VOLUME, self.game_over)
+                arcade.play_sound(self.game_over, DEFAULT_VOLUME)
         # Track if we need to change the viewport
         changed = False
 
@@ -454,10 +589,12 @@ class GameView(arcade.View):
             self.view_left = int(self.view_left)
 
             # Do the scrolling
-            arcade.set_viewport(self.view_left,
-                                SCREEN_WIDTH + self.view_left,
-                                self.view_bottom,
-                                SCREEN_HEIGHT + self.view_bottom)
+            arcade.set_viewport(
+                self.view_left,
+                SCREEN_WIDTH + self.view_left,
+                self.view_bottom,
+                SCREEN_HEIGHT + self.view_bottom,
+            )
 
 
 def main():
