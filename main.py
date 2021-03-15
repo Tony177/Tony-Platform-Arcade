@@ -60,7 +60,7 @@ class Player(arcade.Sprite):
         self.jumping = False
         self.climbing = False
         self.is_on_ladder = False
-        
+
         if PLAYER_SPRITE == 0:  # Male Choosen
             main_path = "images/player_M/male"
         elif PLAYER_SPRITE == 1:  # Female Choosen
@@ -208,7 +208,6 @@ class CharacterView(arcade.View):
     def setup(self):
         # Adding all idle images to a sprites list
 
-
         X_LEFT = SCREEN_WIDTH * 1 / 4
         X_RIGHT = SCREEN_WIDTH * 3 / 4
         Y_BOTTOM = SCREEN_HEIGHT * 1 / 4
@@ -253,16 +252,25 @@ class CharacterView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
+        sprite_x = []
+        sprite_y = []
 
         for x in self.sprites:
             x.draw()
+            sprite_x.append(x.center_x - 50)
+            sprite_y.append(x.bottom - 100)
+
+        arcade.draw_text("Male", sprite_x[0], sprite_y[0], arcade.csscolor.WHITE, 64)
+        arcade.draw_text("Female", sprite_x[1], sprite_y[1], arcade.csscolor.WHITE, 64)
+        arcade.draw_text("Zombie", sprite_x[2], sprite_y[2], arcade.csscolor.WHITE, 64)
+        arcade.draw_text("Soldier", sprite_x[3], sprite_y[3], arcade.csscolor.WHITE, 64)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global PLAYER_SPRITE
         i = 0
         for sprite in self.sprites:
-            if _x > sprite.left and _x < sprite.left + sprite.width:
-                if _y > sprite.bottom and _y < sprite.bottom + sprite.height:
+            if _x > sprite.left and _x < sprite.right:
+                if _y > sprite.bottom and _y < sprite.top:
                     arcade.play_sound(self.start_sound)
                     PLAYER_SPRITE = i
                     game_view = GameView()
@@ -601,7 +609,9 @@ class GameView(arcade.View):
 
 
 def main():
-    os.chdir(os.path.dirname(os.path.realpath(__file__))) # Change working directory to this file's directory
+    os.chdir(
+        os.path.dirname(os.path.realpath(__file__))
+    )  # Change working directory to this file's directory
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     window.show_view(star_view)
