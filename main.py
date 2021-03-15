@@ -14,7 +14,7 @@ COIN_SCALING = 0.5
 
 # Costant used to establish the player's sprite speed and status(pixel per frame)
 PLAYER_MOVEMENT_SPEED = 3.5
-GRAVITY = 1
+GRAVITY = 0.8
 PLAYER_JUMP_SPEED = 16
 
 # 0 Male - 1 Female - 2 Zombie - 3 Soldier
@@ -204,8 +204,9 @@ class CharacterView(arcade.View):
         super().__init__()
 
     def setup(self):
-        # Adding all idle textures to a list of textures
+        # Adding all idle images to a sprites list
 
+        self.start_sound = arcade.load_sound("sounds/upgrade2.wav", False)
         X_LEFT = SCREEN_WIDTH * 1 / 4
         X_RIGHT = SCREEN_WIDTH * 3 / 4
         Y_BOTTOM = SCREEN_HEIGHT * 1 / 4
@@ -257,10 +258,10 @@ class CharacterView(arcade.View):
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global PLAYER_SPRITE
         i = 0
-
         for sprite in self.sprites:
             if _x > sprite.left and _x < sprite.left + sprite.width:
                 if _y > sprite.bottom and _y < sprite.bottom + sprite.height:
+                    arcade.play_sound(self.start_sound)
                     PLAYER_SPRITE = i
                     game_view = GameView()
                     game_view.setup()
@@ -304,12 +305,12 @@ class GameView(arcade.View):
         self.physics_engine = None
 
         # Load sounds
-        self.collect_coin_sound = arcade.load_sound("sounds/coin2.wav")
-        self.jump_sound = arcade.load_sound("sounds/jump1.wav")
-        self.game_over = arcade.load_sound("sounds/gameover3.wav")
+        self.collect_coin_sound = arcade.load_sound("sounds/coin2.wav", False)
+        self.jump_sound = arcade.load_sound("sounds/jump1.wav", False)
+        self.game_over = arcade.load_sound("sounds/gameover3.wav", False)
 
         # Load the background music for game view
-        self.backgroud_sound = arcade.load_sound("musics/funkyrobot.mp3")
+        self.backgroud_sound = arcade.load_sound("musics/funkyrobot.mp3", True)
 
         arcade.set_background_color(arcade.csscolor.SKY_BLUE)
 
@@ -398,8 +399,8 @@ class GameView(arcade.View):
         coins_text = f"Coins: {self.coins}"
         arcade.draw_text(
             coins_text,
-            10 + self.view_left,
-            SCREEN_HEIGHT - 50,
+            self.view_left + 10,
+            self.view_bottom + SCREEN_HEIGHT - 50,
             arcade.csscolor.WHITE,
             36,
         )
@@ -407,8 +408,8 @@ class GameView(arcade.View):
         lifes_text = f"Lifes: {self.lifes}"
         arcade.draw_text(
             lifes_text,
-            10 + self.view_left,
-            SCREEN_HEIGHT - 100,
+            self.view_left + 10,
+            self.view_bottom + SCREEN_HEIGHT - 100,
             arcade.csscolor.WHITE,
             36,
         )
