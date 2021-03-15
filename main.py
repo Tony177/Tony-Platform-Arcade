@@ -359,7 +359,7 @@ class GameView(arcade.View):
             map_object=my_map,
             layer_name=platforms_layer_name,
             scaling=TILE_SCALING,
-            sl_hash=True,
+            use_spatial_hash=True,
         )
 
         # -- Coins
