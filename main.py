@@ -138,6 +138,17 @@ class Player(arcade.Sprite):
             self.character_face_direction
         ]
 
+class PauseView(arcade.View):
+    def __init__(self):
+        super.__init__()
+
+    def on_show(self):
+        arcade.set_background_color(arcade.csscolor.WHITE_SMOKE)
+        arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
+
+    def on_draw(self):
+        arcade.start_render()
+
 
 class StartingView(arcade.View):
     def __init__(self):

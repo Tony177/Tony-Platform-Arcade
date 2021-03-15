@@ -20,6 +20,8 @@ Game's Feature to implement/implemented:
 - Moving Platform :x:
 - Level Menu :x:
 - Pause Menu (ESC) :x: 
+- Control Volume on Pause Menu :x:
+- Generate config file to save user settings :x:
 
 Ideas:
 - Add some kind of lore
