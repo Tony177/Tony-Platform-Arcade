@@ -1,6 +1,7 @@
 # Author : Tony177
 
 import arcade
+import os
 
 # Costant used to represent the window
 SCREEN_WIDTH = 1920
@@ -13,15 +14,15 @@ TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 
 # Costant used to establish the player's sprite speed and status(pixel per frame)
-PLAYER_MOVEMENT_SPEED = 3.5
+PLAYER_MOVEMENT_SPEED = 4.5
 GRAVITY = 0.8
-PLAYER_JUMP_SPEED = 16
+PLAYER_JUMP_SPEED = 18
 
 # 0 Male - 1 Female - 2 Zombie - 3 Soldier
 PLAYER_SPRITE = 0
 
 # Map Starting Point
-PLAYER_START_X = 64
+PLAYER_START_X = 96
 PLAYER_START_Y = 192
 
 DEFAULT_VOLUME = 0.6
@@ -59,7 +60,7 @@ class Player(arcade.Sprite):
         self.jumping = False
         self.climbing = False
         self.is_on_ladder = False
-
+        
         if PLAYER_SPRITE == 0:  # Male Choosen
             main_path = "images/player_M/male"
         elif PLAYER_SPRITE == 1:  # Female Choosen
@@ -202,11 +203,12 @@ class StartingView(arcade.View):
 class CharacterView(arcade.View):
     def __init__(self):
         super().__init__()
+        self.start_sound = arcade.load_sound("sounds/upgrade2.wav", False)
 
     def setup(self):
         # Adding all idle images to a sprites list
 
-        self.start_sound = arcade.load_sound("sounds/upgrade2.wav", False)
+
         X_LEFT = SCREEN_WIDTH * 1 / 4
         X_RIGHT = SCREEN_WIDTH * 3 / 4
         Y_BOTTOM = SCREEN_HEIGHT * 1 / 4
@@ -599,7 +601,7 @@ class GameView(arcade.View):
 
 
 def main():
-
+    os.chdir(os.path.dirname(os.path.realpath(__file__))) # Change working directory to this file's directory
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     window.show_view(star_view)
