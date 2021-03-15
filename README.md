@@ -5,7 +5,7 @@ Simple platform game created for educational purpose.
 
 Game's Feature to implement/implemented:
 - Movement and Physics Engine :heavy_check_mark:
-- First chapter :heavy_check_mark:
+- First chapter (still uncomplete):heavy_check_mark:
 - Death objects :heavy_check_mark:
 - Simple sound (picking coin and death) :heavy_check_mark:
 - Multiple layer map :heavy_check_mark:
@@ -27,4 +27,4 @@ Ideas:
 
 
 ## Thanks
-This game experiment is possible thanks to [Arcade Library](https://github.com/pythonarcade/arcade), and to the free image sample of https://kenney.nl/
+This game experiment is possible thanks to [Arcade Library](https://github.com/pythonarcade/arcade), and to the free image and sound sample offered by https://kenney.nl/

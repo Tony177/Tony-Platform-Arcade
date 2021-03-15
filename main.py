@@ -149,6 +149,8 @@ class StartingView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
+
+        # Drawing instruction on starting view
         start_text_title = "Instruction to play:"
         start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
@@ -252,31 +254,38 @@ class CharacterView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
+
         sprite_x = []
         sprite_y = []
 
         for x in self.sprites:
             x.draw()
+            # Loading into sprite_x and sprite_y the sprite's coordinate
             sprite_x.append(x.center_x - 50)
             sprite_y.append(x.bottom - 100)
 
+        # Text written under every character sprite
         arcade.draw_text("Male", sprite_x[0], sprite_y[0], arcade.csscolor.WHITE, 64)
         arcade.draw_text("Female", sprite_x[1], sprite_y[1], arcade.csscolor.WHITE, 64)
         arcade.draw_text("Zombie", sprite_x[2], sprite_y[2], arcade.csscolor.WHITE, 64)
         arcade.draw_text("Soldier", sprite_x[3], sprite_y[3], arcade.csscolor.WHITE, 64)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        global PLAYER_SPRITE
+        global PLAYER_SPRITE  # To modify global variable player_sprite
         i = 0
         for sprite in self.sprites:
-            if _x > sprite.left and _x < sprite.right:
-                if _y > sprite.bottom and _y < sprite.top:
+            if (
+                _x > sprite.left and _x < sprite.right
+            ):  # Check if the mouse clicked between sprite's left and right border
+                if (
+                    _y > sprite.bottom and _y < sprite.top
+                ):  # Check if the mouse clicked between sprite's bottom and top border
                     arcade.play_sound(self.start_sound)
-                    PLAYER_SPRITE = i
+                    PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
                     game_view = GameView()
                     game_view.setup()
                     self.window.show_view(game_view)
-            i += 1
+            i += 1  # Sliding to the next sprite in list
 
 
 class GameView(arcade.View):
@@ -612,6 +621,7 @@ def main():
     os.chdir(
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
+
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     window.show_view(star_view)
