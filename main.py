@@ -29,10 +29,10 @@ DEFAULT_VOLUME = 0.6
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
-LEFT_VIEWPORT_MARGIN = 300
+LEFT_VIEWPORT_MARGIN = 400
 RIGHT_VIEWPORT_MARGIN = 700
-BOTTOM_VIEWPORT_MARGIN = 50
-TOP_VIEWPORT_MARGIN = 100
+BOTTOM_VIEWPORT_MARGIN = 300
+TOP_VIEWPORT_MARGIN = 300
 
 # Index of textures, first element faces left, second faces right
 RIGHT_FACING = 0

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="118" height="20" tilewidth="128" tileheight="128" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="118" height="40" tilewidth="128" tileheight="128" infinite="0" nextlayerid="5" nextobjectid="1">
  <tileset firstgid="1" name="my_block" tilewidth="128" tileheight="128" tilecount="145" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="152">
@@ -504,24 +504,24 @@
    <image width="128" height="128" source="../images/items/star.png"/>
   </tile>
  </tileset>
- <layer id="1" name="Platforms" width="118" height="20" offsetx="0" offsety="-4">
+ <layer id="1" name="Platforms" width="118" height="40" offsetx="0" offsety="-4">
   <data encoding="base64" compression="zlib">
-   eJzt10EKgCAURdHvripo04XRKFpaSYl/UINEs+QeeIMURXigJAIAAAAAAFCXxpQ+AZ7oTUjMPP6to9cqteYIvm3Zs56Z1Li9+fZ3sVXrYoM8XKdzgn0GFZSVqlOPXsvQ/yepO/Xo9R2jXL9rOTp16BUAgg3a4SP8
+   eJzt191OhDAQhmE48pbUxHs2rOvfRsN16YlMhGSyDjBAS215n2RCXCyOfLRbqgoAAAAAAAAAAAApfXV1U9v1nbo5ACjYqaun1E0AwAGVsv4+1Kk7AAC/UtZeIesvazBKU9IcRbmG9Zc1GLn77Krt6yNpJ3HcZjhHdSatc0x7Va9dNX29GOfbibFzFYsnK7325rQGS6Y6k0adO/XHx/6o90DNilo7dqm5DHLLaCkrU+99/M+5et0XmOtYpkfK9a7+LevzHE1lmnOuep/wrD4/j/w8rMXnyv5Ofxs5Dr+j94dy7t2oy0h/1t/zGrvGVKaxct0y3mN4Vvcw9CX7Q+/ef8lc0s/IpfprzZzy3MtQ1wqV656ZCt2bJ9sQ6+NUD3vn4el5zTX0+8nemYrr/nS28g4h7w/Du4M3U5mj1tycOx8i21TPh5D71Rq1d6bC6tGatzHmqbcf733dMu+t/2HN2JD34ki2ZrcknxDzHfHEfhakfgAZon53
   </data>
  </layer>
- <layer id="2" name="Coins" width="118" height="20" visible="0">
+ <layer id="2" name="Coins" width="118" height="40" visible="0">
   <data encoding="base64" compression="zlib">
-   eJzt1rEJACAQA8B3Myf4/ccRCzux+EbEO0ifKiQCAAAA4B293W4A8Ke5vysnaacBynxdAIC9AR1zAZU=
+   eJzt1kEKgCAQBVA9WXWBFl27S1WLFoXMLmzqPZABRfmzUUsBAAAAAAAAAACestTeCQAAAAByGWu7ZhBlzdQHQDbHHXuOyHxbb+2L3qHW+cM+N9VrBfiit/9n194BAIDf2gB62wbC
   </data>
  </layer>
- <layer id="3" name="Background" width="118" height="20" visible="0">
+ <layer id="3" name="Background" width="118" height="40">
   <data encoding="base64" compression="zlib">
-   eJztzqERADAIADH236BTMB0eX4mh10vcu48AAAAAAICZ3B4AgEfV1WflAgD+0G4fAj4=
+   eJzt0bEJACAQA0D338ApBCdwKXsbKxd4CXeQ4qs8pDUAAAAAAAAAAAAAAACATOuGLPOGLHbNVLnrKOoFgN/t5+4lXwBAhgNxUgfq
   </data>
  </layer>
- <layer id="4" name="Death" width="118" height="20" visible="0">
+ <layer id="4" name="Death" width="118" height="40">
   <data encoding="base64" compression="zlib">
-   eJzt0bEJADAMBDF7k2T/JVOnf7ALCW6CqwIAAAAAAAC2up2JPU5nY176qa8Avwf7sAeu
+   eJzt1bENgDAMBMBkE8T+YwBzpaVBpDBGju6kn+DfcmsAAAAAAAAAAAAAAAAAAMBqzolQzzERatLpuiJ6vV4SZe95WUHEnX5991vPzZNqG4joIKrT7A7/2Ec1/jN3A/qOOMU=
   </data>
  </layer>
 </map>
