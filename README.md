@@ -19,13 +19,14 @@ Game's Feature to implement/implemented:
 - Game Over View :x:
 - Moving Platform :x:
 - Level Menu :x:
-- Pause Menu (ESC) :x: 
-- Control Volume on Pause Menu :x:
+- Pause Menu (ESC) :heavy_check_mark:
+- Control Volume on Pause Menu :heavy_check_mark:
 - Generate config file to save user settings :x:
 
 Ideas:
 - Add some kind of lore
 - Add a clear single and final enemy/objective
+- Beatify graphical contents
 
 
 ## Thanks
