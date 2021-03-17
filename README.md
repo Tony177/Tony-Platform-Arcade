@@ -1,5 +1,5 @@
 # Tony177's Platform Arcade
-Simple platform game created for educational purpose.
+Simple platform game created for educational and learning purpose.
 
 ## Game Logic
 ### Button
@@ -12,7 +12,8 @@ Simple platform game created for educational purpose.
 If you collect 100 coins you get an extra life  
 If you lose all the lifes you've lost the game\
 Click with the mouse to start character selection\
-Click on one of the four image to select a character
+Click on one of the four image to select a character\
+You save the game every time you leave the game from Pause Menu
 ## Structure of the game
 
 Game's Feature to implement/implemented:
@@ -31,9 +32,9 @@ Game's Feature to implement/implemented:
 - Game Over View :x:
 - Moving Platform :x:
 - Level Menu :x:
-- Pause Menu (ESC) :heavy_check_mark:
+- Pause Menu (ESC) interface (works but it's ugly) :x:
 - Control Volume on Pause Menu :heavy_check_mark:
-- Generate config file to save user settings :x:
+- Generate config file to save user settings :heavy_check_mark:
 - Added encryption and decryption with Fernet Cryptography :heavy_check_mark:
 - Implemented Load and Save function (handling crypted file) :heavy_check_mark:
 
@@ -43,7 +44,7 @@ Ideas:
 - Beatify graphical contents
 
 ## Cryptography
-Using the Fernet Cryptography Module, the saving file is encrypted/decrypted using the game_key.key generated with key.py program\
+Using the <b><i>Fernet Cryptography Module</b></i>, the saving file is encrypted/decrypted using the game_key.key generated with [key.py](#key.py) program\
 Upon generating a key it can be used to encrypt (encrypt function) and to decrypt (decrypt function)
 
 ## Thanks

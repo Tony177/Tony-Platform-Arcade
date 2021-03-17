@@ -653,6 +653,34 @@ class GameView(arcade.View):
             self.right_pressed = False
 
         self.process_keychange()
+    def boundary_check(self):
+        changed = False
+        # Scroll left
+        left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
+        if self.player_sprite.left < left_boundary:
+            self.view_left -= left_boundary - self.player_sprite.left
+            changed = True
+
+        # Scroll right
+        right_boundary = self.view_left + SCREEN_WIDTH - RIGHT_VIEWPORT_MARGIN
+        if self.player_sprite.right > right_boundary:
+            self.view_left += self.player_sprite.right - right_boundary
+            changed = True
+
+        # Scroll up
+        top_boundary = self.view_bottom + SCREEN_HEIGHT - TOP_VIEWPORT_MARGIN
+        if self.player_sprite.top > top_boundary:
+            self.view_bottom += self.player_sprite.top - top_boundary
+            changed = True
+
+        # Scroll down
+        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
+        if self.player_sprite.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
+            changed = True
+        if changed:
+            return True
+        return False
 
     def on_update(self, delta_time):
 
@@ -719,6 +747,9 @@ class GameView(arcade.View):
                 self.coins -= 100
                 self.lifes += 1
 
+        # Starting setting changed to false to avoid UnboundLocalError at 770
+        changed = False
+
         if (
             arcade.check_for_collision_with_list(self.player_sprite, self.death_list)
             or self.player_sprite.center_y < -100
@@ -739,33 +770,7 @@ class GameView(arcade.View):
                 changed = True
                 arcade.play_sound(self.game_over, DEFAULT_VOLUME)
         # Track if we need to change the viewport
-        changed = False
-
-        # Scroll left
-        left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
-        if self.player_sprite.left < left_boundary:
-            self.view_left -= left_boundary - self.player_sprite.left
-            changed = True
-
-        # Scroll right
-        right_boundary = self.view_left + SCREEN_WIDTH - RIGHT_VIEWPORT_MARGIN
-        if self.player_sprite.right > right_boundary:
-            self.view_left += self.player_sprite.right - right_boundary
-            changed = True
-
-        # Scroll up
-        top_boundary = self.view_bottom + SCREEN_HEIGHT - TOP_VIEWPORT_MARGIN
-        if self.player_sprite.top > top_boundary:
-            self.view_bottom += self.player_sprite.top - top_boundary
-            changed = True
-
-        # Scroll down
-        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
-        if self.player_sprite.bottom < bottom_boundary:
-            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
-            changed = True
-
-        if changed:
+        if self.boundary_check() or changed:
             # Only scroll to integers. Otherwise we end up with pixels that
             # don't line up on the screen
             self.view_bottom = int(self.view_bottom)
@@ -778,28 +783,18 @@ class GameView(arcade.View):
                 self.view_bottom,
                 SCREEN_HEIGHT + self.view_bottom,
             )
-
+        
 
 def main():
     os.chdir(
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
-    x = 2
-    if x == 1:
-        load_list = load()
-        print(load_list)
-        y = load_list[5].split(",")
-        print(y)
-        y[0] = y[0].split("[")[1]
-        y[-1] = y[-1].split("]")[0]
-        for elem in y:
-            print(elem)
-    else:
-        window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-        star_view = StartingView()
-        star_view.setup()
-        window.show_view(star_view)
-        arcade.run()
+    
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    star_view = StartingView()
+    star_view.setup()
+    window.show_view(star_view)
+    arcade.run()
 
 
 if __name__ == "__main__":
