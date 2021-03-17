@@ -64,12 +64,13 @@ def save(list):
     for value in list:
         text += str(value)
         text += '\n'
+    text = "End"
     text = str.encode(text)
     encrypt(text)
         
 
 def load():
-    with open ("save.cryp",'rb') as file_enc:
+    with open ("save.dat",'rb') as file_enc:
         data = file_enc.read()
     decrypted = bytes.decode(decrypt(data))
     list = decrypted.split("\n")
@@ -83,7 +84,7 @@ def encrypt(file):
         key = mykey.read()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(file)
-    with open ("save.cryp", 'wb') as encrypted_file:
+    with open ("save.dat", 'wb') as encrypted_file:
         encrypted_file.write(encrypted)
 
 def decrypt(file):
