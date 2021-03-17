@@ -15,8 +15,8 @@ COIN_SCALING = 0.5
 
 # Costant used to establish the player's sprite speed and status(pixel per frame)
 PLAYER_MOVEMENT_SPEED = 4.5
-GRAVITY = 0.8
-PLAYER_JUMP_SPEED = 18
+GRAVITY = 0.9
+PLAYER_JUMP_SPEED = 20
 
 # 0 Male - 1 Female - 2 Zombie - 3 Soldier
 PLAYER_SPRITE = 0
@@ -29,7 +29,7 @@ DEFAULT_VOLUME = 0.6
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
-LEFT_VIEWPORT_MARGIN = 400
+LEFT_VIEWPORT_MARGIN = 300
 RIGHT_VIEWPORT_MARGIN = 700
 BOTTOM_VIEWPORT_MARGIN = 300
 TOP_VIEWPORT_MARGIN = 300
@@ -37,6 +37,18 @@ TOP_VIEWPORT_MARGIN = 300
 # Index of textures, first element faces left, second faces right
 RIGHT_FACING = 0
 LEFT_FACING = 1
+
+
+def check_box(sprite, _x, _y):
+    if sprite is None:
+        return False
+    # Check if the mouse clicked between sprite's left, right, bottom and top border
+    if _x > sprite.left:
+        if _x < sprite.right:
+            if _y > sprite.bottom:
+                if _y < sprite.top:
+                    return True
+    return False
 
 
 def load_texture_pair(filename):
@@ -121,7 +133,7 @@ class Player(arcade.Sprite):
         if self.change_y > 0 and not self.is_on_ladder:
             self.texture = self.jump_texture_pair[self.character_face_direction]
             return
-        elif self.change_y < 0 and not self.is_on_ladder:
+        if self.change_y < 0 and not self.is_on_ladder:
             self.texture = self.fall_texture_pair[self.character_face_direction]
             return
 
@@ -138,21 +150,67 @@ class Player(arcade.Sprite):
             self.character_face_direction
         ]
 
+
 class PauseView(arcade.View):
-    def __init__(self):
-        super.__init__()
+    def __init__(self, game):
+        super().__init__()
+        self.game = game # Return point after Resume Button is pressed
+
+    def setup(self):
+        self.resume = arcade.Sprite(
+            "images/button/red_button_normal.png",
+            center_x=SCREEN_WIDTH / 2,
+            center_y=SCREEN_HEIGHT * 3 / 4,
+        )
+        self.plus_volume = arcade.Sprite(
+            "images/button/red_button_normal.png",
+            center_x=SCREEN_WIDTH / 2 + 100,
+            center_y=SCREEN_HEIGHT * 2 / 4,
+        )
+        self.minus_volume = arcade.Sprite(
+            "images/button/red_button_normal.png",
+            center_x=SCREEN_WIDTH / 2 - 100,
+            center_y=SCREEN_HEIGHT * 2 / 4,
+        )
+        self.exit = arcade.Sprite(
+            "images/button/red_button_normal.png",
+            center_x=SCREEN_WIDTH / 2,
+            center_y=SCREEN_HEIGHT * 1 / 4,
+        )
 
     def on_show(self):
+        self.window.set_mouse_visible(True)
         arcade.set_background_color(arcade.csscolor.WHITE_SMOKE)
         arcade.set_viewport(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1)
 
     def on_draw(self):
         arcade.start_render()
 
+        self.resume.draw()
+        self.plus_volume.draw()
+        self.minus_volume.draw()
+        self.exit.draw()
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        global DEFAULT_VOLUME
+        if check_box(self.resume, _x, _y):
+            self.window.show_view(self.game)
+
+        if DEFAULT_VOLUME < 1 and check_box(self.plus_volume, _x, _y):
+            DEFAULT_VOLUME += 0.1
+        if DEFAULT_VOLUME > 0 and check_box(self.minus_volume, _x, _y):
+            DEFAULT_VOLUME -= 0.1
+        if check_box(self.exit, _x, _y):
+            # TO BE DONE: Save config file and data
+            self.window.close()
+
 
 class StartingView(arcade.View):
     def __init__(self):
         super().__init__()
+
+    def setup(self):
+        pass
 
     def on_show(self):
         arcade.set_background_color(arcade.csscolor.DARK_RED)
@@ -160,10 +218,12 @@ class StartingView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-
+        # Setting mouse visible to permit selection
+        self.window.set_mouse_visible(True)
         # Drawing instruction on starting view
         start_text_title = "Instruction to play:"
-        start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
+        start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n \
+            Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
         start_text_begin = "Click with the mouse to start character selection"
         arcade.draw_text(
@@ -285,26 +345,20 @@ class CharacterView(arcade.View):
         global PLAYER_SPRITE  # To modify global variable player_sprite
         i = 0
         for sprite in self.sprites:
-            if (
-                _x > sprite.left and _x < sprite.right
-            ):  # Check if the mouse clicked between sprite's left and right border
-                if (
-                    _y > sprite.bottom and _y < sprite.top
-                ):  # Check if the mouse clicked between sprite's bottom and top border
-                    arcade.play_sound(self.start_sound)
-                    PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
-                    game_view = GameView()
-                    game_view.setup()
-                    self.window.show_view(game_view)
-            i += 1  # Sliding to the next sprite in list
-
+            if check_box(sprite, _x, _y):
+                arcade.play_sound(self.start_sound)
+                PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
+                game_view = GameView()
+                game_view.setup()
+                self.window.show_view(game_view)
+            # Sliding to the next sprite in list
+            i += 1
 
 class GameView(arcade.View):
     def __init__(self):
 
         # Call the parent class and set up the window
         super().__init__()
-        self.window.set_mouse_visible(False)
 
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
@@ -323,7 +377,6 @@ class GameView(arcade.View):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
-        self.end_map = 0
 
         # Track the current state of what key is pressed
         self.left_pressed = False
@@ -342,14 +395,13 @@ class GameView(arcade.View):
         # Load the background music for game view
         self.backgroud_sound = arcade.load_sound("musics/funkyrobot.mp3", True)
 
-        arcade.set_background_color(arcade.csscolor.SKY_BLUE)
-
     def setup(self):
         # This function permit the restart of the game
 
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
+        self.end_map = 0
 
         # Create the Sprite lists
         # Spatial hash speed up collision detection but slow down movement
@@ -365,7 +417,7 @@ class GameView(arcade.View):
         self.lifes = 3
 
         # Start background music
-        self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
+        self.media_player = self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
 
         # Set up the player
         self.player_list = arcade.SpriteList()
@@ -403,20 +455,24 @@ class GameView(arcade.View):
         self.background_list = arcade.process_layer(
             my_map, background_layer_namer, TILE_SCALING
         )
-        # --- Other stuff
-        # Set the background color
-        if my_map.background_color:
-            arcade.set_background_color(my_map.background_color)
 
         # Create the 'physics engine'
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite, self.wall_list, GRAVITY
         )
 
+    def on_hide_view(self):
+        # When the view is changed do this
+        self.media_player.pause()
+
     def on_draw(self):
         # Render the game
+        self.backgroud_sound.set_volume(DEFAULT_VOLUME, self.media_player)
+        self.media_player.play()
+        arcade.set_background_color(arcade.csscolor.SKY_BLUE)
 
         arcade.start_render()
+        self.window.set_mouse_visible(False)
 
         # Code to draw the screen goes here
         self.wall_list.draw()
@@ -479,28 +535,38 @@ class GameView(arcade.View):
     def on_key_press(self, key, modifiers):
         # Called when a key is pressed
 
-        if key == arcade.key.UP or key == arcade.key.W:
+        if key in (arcade.key.UP, arcade.key.W):
             self.up_pressed = True
-        elif key == arcade.key.DOWN or key == arcade.key.S:
+        elif key in (arcade.key.DOWN, arcade.key.S):
             self.down_pressed = True
-        elif key == arcade.key.LEFT or key == arcade.key.A:
+        elif key in (arcade.key.LEFT, arcade.key.A):
             self.left_pressed = True
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
+        elif key in (arcade.key.RIGHT, arcade.key.D):
             self.right_pressed = True
+        elif key == arcade.key.ESCAPE:
+            # To avoid movement bug set all previous keys to False
+            self.up_pressed = False
+            self.down_pressed = False
+            self.left_pressed = False
+            self.right_pressed = False
+            # Load Pause Menu
+            esc_view = PauseView(self)
+            esc_view.setup()
+            self.window.show_view(esc_view)
 
         self.process_keychange()
 
     def on_key_release(self, key, modifiers):
         # Called when a key is released
 
-        if key == arcade.key.UP or key == arcade.key.W:
+        if key in (arcade.key.UP, arcade.key.W):
             self.up_pressed = False
             self.jump_needs_reset = False
-        elif key == arcade.key.DOWN or key == arcade.key.S:
+        elif key in (arcade.key.DOWN, arcade.key.S):
             self.down_pressed = False
-        elif key == arcade.key.LEFT or key == arcade.key.A:
+        elif key in (arcade.key.LEFT, arcade.key.A):
             self.left_pressed = False
-        elif key == arcade.key.RIGHT or key == arcade.key.D:
+        elif key in (arcade.key.RIGHT, arcade.key.D):
             self.right_pressed = False
 
         self.process_keychange()
@@ -635,6 +701,7 @@ def main():
 
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
+    star_view.setup()
     window.show_view(star_view)
     arcade.run()
 
