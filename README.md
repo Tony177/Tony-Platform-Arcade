@@ -1,6 +1,18 @@
 # Tony177's Platform Arcade
 Simple platform game created for educational purpose.
 
+## Game Logic
+### Button
+- Press A,D or ARROW LEFT, RIGHT to move
+- Press W or ARROW UP or SPACE to jump
+- Press S or ARROW DOWN to move down on ladder
+- Press ESC to open menu
+
+### Logic
+If you collect 100 coins you get an extra life  
+If you lose all the lifes you've lost the game\
+Click with the mouse to start character selection\
+Click on one of the four image to select a character
 ## Structure of the game
 
 Game's Feature to implement/implemented:

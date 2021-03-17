@@ -225,7 +225,7 @@ class StartingView(arcade.View):
         start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP or SPACE to jump\n \
             Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
-        start_text_begin = "Click with the mouse to start character selection"
+        start_text_begin = "Click with the mouse to start character selection \n Click on one of the four image to select a character"
         arcade.draw_text(
             start_text_title,
             SCREEN_WIDTH / 2,
