@@ -59,40 +59,43 @@ def load_texture_pair(filename):
         arcade.load_texture(filename, flipped_horizontally=True),
     ]
 
-def save(list):
-    text = "Start \n"
-    for value in list:
+
+def save(save_list):
+    text = "Start Signature\n"
+    for value in save_list:
         text += str(value)
-        text += '\n'
-    text = "End"
+        text += "\n"
+    text += "End Signature"
     text = str.encode(text)
     encrypt(text)
-        
+
 
 def load():
-    with open ("save.dat",'rb') as file_enc:
+    with open("save.dat", "rb") as file_enc:
         data = file_enc.read()
     decrypted = bytes.decode(decrypt(data))
-    list = decrypted.split("\n")
-    list.pop(0) # Pop first element Start
-    list.pop(-1) # Pop last element blank character
-    return list
-    
+    load_list = decrypted.split("\n")
+    load_list.pop(0)  # Pop first element Start
+    load_list.pop(-1)  # Pop last element blank character
+    return load_list
+
 
 def encrypt(file):
-    with open('game_key.key', 'rb') as mykey:
+    with open("game_key.key", "rb") as mykey:
         key = mykey.read()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(file)
-    with open ("save.dat", 'wb') as encrypted_file:
+    with open("save.dat", "wb") as encrypted_file:
         encrypted_file.write(encrypted)
 
+
 def decrypt(file):
-    with open('game_key.key', 'rb') as mykey:
+    with open("game_key.key", "rb") as mykey:
         key = mykey.read()
     fernet = Fernet(key)
     original = fernet.decrypt(file)
     return original
+
 
 class Player(arcade.Sprite):
     def __init__(self):
@@ -189,7 +192,7 @@ class Player(arcade.Sprite):
 class PauseView(arcade.View):
     def __init__(self, game):
         super().__init__()
-        self.game = game # Return point after Resume Button is pressed
+        self.game = game  # Return point after Resume Button is pressed
 
     def setup(self):
         self.resume = arcade.Sprite(
@@ -389,6 +392,7 @@ class CharacterView(arcade.View):
             # Sliding to the next sprite in list
             i += 1
 
+
 class GameView(arcade.View):
     def __init__(self):
 
@@ -406,7 +410,8 @@ class GameView(arcade.View):
         self.player_sprite = None
 
         # Keep track of the score
-        self.picked_coins = []
+        self.picked_coins_x = []
+        self.picked_coins_y = []
         self.coins = 0
         self.lifes = 3
 
@@ -437,7 +442,7 @@ class GameView(arcade.View):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
-        self.end_map = 0
+        self.level = 1
 
         # Create the Sprite lists
         # Spatial hash speed up collision detection but slow down movement
@@ -496,6 +501,39 @@ class GameView(arcade.View):
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player_sprite, self.wall_list, GRAVITY
         )
+        # After all base setup try load save.dat
+        try:
+            save = load()
+            self.player_sprite.set_position(float(save[0]), float(save[1]))
+            self.level = int(save[2])
+            self.lifes = int(save[3])
+            self.coins = int(save[4])
+            # Removed comma from x coordinate list
+            coins_to_remove_x = save[5].split(",")
+            # Removed first square bracket
+            coins_to_remove_x[0] = coins_to_remove_x[0].split("[")[1]
+            # Removed last square bracket
+            coins_to_remove_x[-1] = coins_to_remove_x[-1].split("]")[0]
+            # Removed comma from y coordinate list
+            coins_to_remove_y = save[6].split(",")
+            # Removed first square bracket
+            coins_to_remove_y[0] = coins_to_remove_y[0].split("[")[1]
+            # Removed last square bracket
+            coins_to_remove_y[-1] = coins_to_remove_y[-1].split("]")[0]
+            leng = len(coins_to_remove_x)
+            for c in self.coin_list:
+                for i in range(leng):
+                    if c.center_x == float(coins_to_remove_x[i]):
+                        if c.center_y == float(coins_to_remove_y[i]):
+                            c.remove_from_sprite_lists()
+                            coins_to_remove_y.pop(i)
+                            coins_to_remove_x.pop(i)
+                            leng = len(coins_to_remove_x)
+                            break
+
+        except FileNotFoundError:
+            pass
+
 
     def on_hide_view(self):
         # When the view is changed do this
@@ -588,6 +626,15 @@ class GameView(arcade.View):
             # Load Pause Menu
             esc_view = PauseView(self)
             esc_view.setup()
+            save_list = []
+            save_list.append(self.player_sprite.center_x)
+            save_list.append(self.player_sprite.center_y)
+            save_list.append(self.level)
+            save_list.append(self.lifes)
+            save_list.append(self.coins)
+            save_list.append(self.picked_coins_x)
+            save_list.append(self.picked_coins_y)
+            save(save_list)
             self.window.show_view(esc_view)
 
         self.process_keychange()
@@ -660,11 +707,12 @@ class GameView(arcade.View):
         coin_hit_list = arcade.check_for_collision_with_list(
             self.player_sprite, self.coin_list
         )
-        
+
         # Loop through each coin we hit (if any), remove it and play a sound
         for coin in coin_hit_list:
+            self.picked_coins_x.append(coin.center_x)
+            self.picked_coins_y.append(coin.center_y)
             coin.remove_from_sprite_lists()
-            self.picked_coins.append(coin)
             self.coins += 1
             arcade.play_sound(self.collect_coin_sound, DEFAULT_VOLUME)
             if self.coins >= 100:
@@ -736,12 +784,22 @@ def main():
     os.chdir(
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
-
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    star_view = StartingView()
-    star_view.setup()
-    window.show_view(star_view)
-    arcade.run()
+    x = 2
+    if x == 1:
+        load_list = load()
+        print(load_list)
+        y = load_list[5].split(",")
+        print(y)
+        y[0] = y[0].split("[")[1]
+        y[-1] = y[-1].split("]")[0]
+        for elem in y:
+            print(elem)
+    else:
+        window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        star_view = StartingView()
+        star_view.setup()
+        window.show_view(star_view)
+        arcade.run()
 
 
 if __name__ == "__main__":
