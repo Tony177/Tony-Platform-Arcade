@@ -222,7 +222,7 @@ class StartingView(arcade.View):
         self.window.set_mouse_visible(True)
         # Drawing instruction on starting view
         start_text_title = "Instruction to play:"
-        start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP to jump\n \
+        start_text_body = "Press A,D or ARROW LEFT, RIGHT to move \n Press W or ARROW UP or SPACE to jump\n \
             Press S or ARROW DOWN to move down on ladder \n Press ESC to open menu"
         start_text_end = "If you collect 100 coins you get an extra life \n If you lose all the lifes you've lost"
         start_text_begin = "Click with the mouse to start character selection"
@@ -535,7 +535,7 @@ class GameView(arcade.View):
     def on_key_press(self, key, modifiers):
         # Called when a key is pressed
 
-        if key in (arcade.key.UP, arcade.key.W):
+        if key in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
             self.up_pressed = True
         elif key in (arcade.key.DOWN, arcade.key.S):
             self.down_pressed = True
@@ -559,7 +559,7 @@ class GameView(arcade.View):
     def on_key_release(self, key, modifiers):
         # Called when a key is released
 
-        if key in (arcade.key.UP, arcade.key.W):
+        if key in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
             self.up_pressed = False
             self.jump_needs_reset = False
         elif key in (arcade.key.DOWN, arcade.key.S):
