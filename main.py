@@ -2,6 +2,7 @@
 
 import arcade
 import os
+from cryptography.fernet import Fernet
 
 # Costant used to represent the window
 SCREEN_WIDTH = 1920
@@ -58,6 +59,39 @@ def load_texture_pair(filename):
         arcade.load_texture(filename, flipped_horizontally=True),
     ]
 
+def save(list):
+    text = "Start \n"
+    for value in list:
+        text += str(value)
+        text += '\n'
+    text = str.encode(text)
+    encrypt(text)
+        
+
+def load():
+    with open ("save.cryp",'rb') as file_enc:
+        data = file_enc.read()
+    decrypted = bytes.decode(decrypt(data))
+    list = decrypted.split("\n")
+    list.pop(0) # Pop first element Start
+    list.pop(-1) # Pop last element blank character
+    return list
+    
+
+def encrypt(file):
+    with open('game_key.key', 'rb') as mykey:
+        key = mykey.read()
+    fernet = Fernet(key)
+    encrypted = fernet.encrypt(file)
+    with open ("save.cryp", 'wb') as encrypted_file:
+        encrypted_file.write(encrypted)
+
+def decrypt(file):
+    with open('game_key.key', 'rb') as mykey:
+        key = mykey.read()
+    fernet = Fernet(key)
+    original = fernet.decrypt(file)
+    return original
 
 class Player(arcade.Sprite):
     def __init__(self):
@@ -371,6 +405,7 @@ class GameView(arcade.View):
         self.player_sprite = None
 
         # Keep track of the score
+        self.picked_coins = []
         self.coins = 0
         self.lifes = 3
 
@@ -624,9 +659,11 @@ class GameView(arcade.View):
         coin_hit_list = arcade.check_for_collision_with_list(
             self.player_sprite, self.coin_list
         )
+        
         # Loop through each coin we hit (if any), remove it and play a sound
         for coin in coin_hit_list:
             coin.remove_from_sprite_lists()
+            self.picked_coins.append(coin)
             self.coins += 1
             arcade.play_sound(self.collect_coin_sound, DEFAULT_VOLUME)
             if self.coins >= 100:

@@ -27,19 +27,24 @@ Game's Feature to implement/implemented:
 - General Objective of the game :x:
 - Simple animation of the images :heavy_check_mark:
 - Selection of various characters :heavy_check_mark:
-- Starting View :heavy_check_mark:
+- Starting View with various function :x:
 - Game Over View :x:
 - Moving Platform :x:
 - Level Menu :x:
 - Pause Menu (ESC) :heavy_check_mark:
 - Control Volume on Pause Menu :heavy_check_mark:
 - Generate config file to save user settings :x:
+- Added encryption and decryption with Fernet Cryptography :heavy_check_mark:
+- Implemented Load and Save function (handling crypted file) :heavy_check_mark:
 
 Ideas:
 - Add some kind of lore
 - Add a clear single and final enemy/objective
 - Beatify graphical contents
 
+## Cryptography
+Using the Fernet Cryptography Module, the saving file is encrypted/decrypted using the game_key.key generated with key.py program\
+Upon generating a key it can be used to encrypt (encrypt function) and to decrypt (decrypt function)
 
 ## Thanks
 This game experiment is possible thanks to [Arcade Library](https://github.com/pythonarcade/arcade), and to the free image and sound sample offered by https://kenney.nl/
