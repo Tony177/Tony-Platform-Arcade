@@ -57,7 +57,7 @@ def save(save_list: list):
     encrypt(text)
 
 
-def load():
+def load() -> list:
     with open("save.dat", "rb") as file_enc:
         data = file_enc.read()
     decrypted = bytes.decode(decrypt(data))
@@ -76,7 +76,7 @@ def encrypt(file: bytes):
         encrypted_file.write(encrypted)
 
 
-def decrypt(file: bytes):
+def decrypt(file: bytes) -> bytes:
     with open("game_key.key", "rb") as mykey:
         key = mykey.read()
     fernet = Fernet(key)
