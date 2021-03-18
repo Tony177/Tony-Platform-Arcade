@@ -39,19 +39,6 @@ TOP_VIEWPORT_MARGIN = 300
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
-
-def check_box(sprite, _x, _y):
-    if sprite is None:
-        return False
-    # Check if the mouse clicked between sprite's left, right, bottom and top border
-    if _x > sprite.left:
-        if _x < sprite.right:
-            if _y > sprite.bottom:
-                if _y < sprite.top:
-                    return True
-    return False
-
-
 def load_texture_pair(filename):
 
     return [
@@ -60,7 +47,7 @@ def load_texture_pair(filename):
     ]
 
 
-def save(save_list):
+def save(save_list: list):
     text = "Start Signature\n"
     for value in save_list:
         text += str(value)
@@ -80,7 +67,7 @@ def load():
     return load_list
 
 
-def encrypt(file):
+def encrypt(file: bytes):
     with open("game_key.key", "rb") as mykey:
         key = mykey.read()
     fernet = Fernet(key)
@@ -89,7 +76,7 @@ def encrypt(file):
         encrypted_file.write(encrypted)
 
 
-def decrypt(file):
+def decrypt(file: bytes):
     with open("game_key.key", "rb") as mykey:
         key = mykey.read()
     fernet = Fernet(key)
@@ -146,7 +133,7 @@ class Player(arcade.Sprite):
         self.texture = self.idle_texture_pair[0]
         self.set_hit_box(self.texture.hit_box_points)
 
-    def update_animation(self, delta_time):
+    def update_animation(self, delta_time: float = 1/60):
 
         # Figure out if we need to flip face left or right
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
@@ -231,14 +218,14 @@ class PauseView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global DEFAULT_VOLUME
-        if check_box(self.resume, _x, _y):
+        if self.resume.collides_with_point((_x,_y)):
             self.window.show_view(self.game)
 
-        if DEFAULT_VOLUME < 1 and check_box(self.plus_volume, _x, _y):
+        if DEFAULT_VOLUME < 1 and self.plus_volume.collides_with_point((_x,_y)):
             DEFAULT_VOLUME += 0.1
-        if DEFAULT_VOLUME > 0 and check_box(self.minus_volume, _x, _y):
+        if DEFAULT_VOLUME > 0 and self.minus_volume.collides_with_point((_x,_y)):
             DEFAULT_VOLUME -= 0.1
-        if check_box(self.exit, _x, _y):
+        if self.exit.collides_with_point((_x,_y)):
             # TO BE DONE: Save config file and data
             self.window.close()
 
@@ -383,7 +370,8 @@ class CharacterView(arcade.View):
         global PLAYER_SPRITE  # To modify global variable player_sprite
         i = 0
         for sprite in self.sprites:
-            if check_box(sprite, _x, _y):
+            # if check_box(sprite, _x, _y):
+            if sprite.collides_with_point((_x,_y)):
                 arcade.play_sound(self.start_sound)
                 PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
                 game_view = GameView()
