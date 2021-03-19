@@ -112,9 +112,19 @@
   </tile>
   <tile id="188">
    <image width="128" height="128" source="../images/tiles/grassHill_left.png"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="128">
+     <polygon points="0,0 128,0 0,-128"/>
+    </object>
+   </objectgroup>
   </tile>
   <tile id="189">
    <image width="128" height="128" source="../images/tiles/grassHill_right.png"/>
+   <objectgroup draworder="index" id="2">
+    <object id="1" x="0" y="128">
+     <polyline points="0,0 128,-128 128,0 0,0"/>
+    </object>
+   </objectgroup>
   </tile>
   <tile id="190">
    <image width="128" height="128" source="../images/tiles/grassLeft.png"/>

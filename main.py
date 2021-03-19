@@ -48,11 +48,11 @@ def load_texture_pair(filename):
 
 
 def save(save_list: list):
-    text = "Start Signature\n"
+    text = "Start\n"
     for value in save_list:
         text += str(value)
         text += "\n"
-    text += "End Signature"
+    text += "End"
     text = str.encode(text)
     encrypt(text)
 
@@ -60,6 +60,7 @@ def save(save_list: list):
 def load() -> list:
     with open("save.dat", "rb") as file_enc:
         data = file_enc.read()
+    file_enc.close()
     decrypted = bytes.decode(decrypt(data))
     load_list = decrypted.split("\n")
     load_list.pop(0)  # Pop first element Start
@@ -70,15 +71,18 @@ def load() -> list:
 def encrypt(file: bytes):
     with open("game_key.key", "rb") as mykey:
         key = mykey.read()
+    mykey.close()
     fernet = Fernet(key)
     encrypted = fernet.encrypt(file)
     with open("save.dat", "wb") as encrypted_file:
         encrypted_file.write(encrypted)
+    encrypted_file.close()
 
 
 def decrypt(file: bytes) -> bytes:
     with open("game_key.key", "rb") as mykey:
         key = mykey.read()
+    mykey.close()
     fernet = Fernet(key)
     original = fernet.decrypt(file)
     return original
@@ -210,11 +214,15 @@ class PauseView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-
+        
         self.resume.draw()
         self.plus_volume.draw()
         self.minus_volume.draw()
         self.exit.draw()
+        arcade.draw_text("Resume",self.resume.center_x-10.0, self.resume.center_y, arcade.csscolor.BLACK)
+        arcade.draw_text("Volume Up",self.plus_volume.center_x-10.0, self.plus_volume.center_y, arcade.csscolor.BLACK)
+        arcade.draw_text("Volume Down",self.minus_volume.center_x-10.0, self.minus_volume.center_y, arcade.csscolor.BLACK)
+        arcade.draw_text("Exit",self.exit.center_x-10.0, self.exit.center_y, arcade.csscolor.BLACK)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global DEFAULT_VOLUME
@@ -301,7 +309,6 @@ class StartingView(arcade.View):
 class CharacterView(arcade.View):
     def __init__(self):
         super().__init__()
-        self.start_sound = arcade.load_sound("sounds/upgrade2.wav", False)
 
     def setup(self):
         # Adding all idle images to a sprites list
@@ -372,7 +379,6 @@ class CharacterView(arcade.View):
         for sprite in self.sprites:
             # if check_box(sprite, _x, _y):
             if sprite.collides_with_point((_x,_y)):
-                arcade.play_sound(self.start_sound)
                 PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
                 game_view = GameView()
                 game_view.setup()
@@ -430,20 +436,18 @@ class GameView(arcade.View):
         # Used to keep track of our scrolling
         self.view_bottom = 0
         self.view_left = 0
-        self.level = 1
 
         # Create the Sprite lists
         # Spatial hash speed up collision detection but slow down movement
         # The player move often so don't use Spatial Hash
 
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True,)
         self.coin_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
         self.death_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
         self.background_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
 
         # Keep track of the score
-        self.coins = 0
-        self.lifes = 3
+
 
         # Start background music
         self.media_player = self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
@@ -451,8 +455,6 @@ class GameView(arcade.View):
         # Set up the player
         self.player_list = arcade.SpriteList()
         self.player_sprite = Player()
-        self.player_sprite.center_x = PLAYER_START_X
-        self.player_sprite.center_y = PLAYER_START_Y
         self.player_list.append(self.player_sprite)
 
         # Name of map file to load
@@ -471,7 +473,7 @@ class GameView(arcade.View):
             map_object=my_map,
             layer_name=platforms_layer_name,
             scaling=TILE_SCALING,
-            use_spatial_hash=True,
+            use_spatial_hash=True
         )
 
         # -- Coins
@@ -508,19 +510,23 @@ class GameView(arcade.View):
             coins_to_remove_y[0] = coins_to_remove_y[0].split("[")[1]
             # Removed last square bracket
             coins_to_remove_y[-1] = coins_to_remove_y[-1].split("]")[0]
-            leng = len(coins_to_remove_x)
-            for c in self.coin_list:
-                for i in range(leng):
-                    if c.center_x == float(coins_to_remove_x[i]):
-                        if c.center_y == float(coins_to_remove_y[i]):
-                            c.remove_from_sprite_lists()
-                            coins_to_remove_y.pop(i)
-                            coins_to_remove_x.pop(i)
-                            leng = len(coins_to_remove_x)
-                            break
-
+            if coins_to_remove_x: # Check empty list
+                for c in self.coin_list:
+                    for i in range(len(coins_to_remove_x)):
+                        if c.center_x == float(coins_to_remove_x[i]):
+                            if c.center_y == float(coins_to_remove_y[i]):
+                                c.remove_from_sprite_lists()
+                                coins_to_remove_y.pop(i)
+                                coins_to_remove_x.pop(i)
+                                break
         except FileNotFoundError:
-            pass
+            # If not found any save file set initial value
+            self.coins = 0
+            self.lifes = 3
+            self.level = 1
+            self.player_sprite.center_x = PLAYER_START_X
+            self.player_sprite.center_y = PLAYER_START_Y
+            
 
 
     def on_hide_view(self):
