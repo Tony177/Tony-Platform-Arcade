@@ -2,7 +2,7 @@
 
 import arcade
 import os
-from cryptography.fernet import Fernet
+import utils
 
 # Costant used to represent the window
 SCREEN_WIDTH = 1920
@@ -39,55 +39,6 @@ TOP_VIEWPORT_MARGIN = 300
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
-def load_texture_pair(filename):
-
-    return [
-        arcade.load_texture(filename),
-        arcade.load_texture(filename, flipped_horizontally=True),
-    ]
-
-
-def save(save_list: list):
-    text = "Start\n"
-    for value in save_list:
-        text += str(value)
-        text += "\n"
-    text += "End"
-    text = str.encode(text)
-    encrypt(text)
-
-
-def load() -> list:
-    with open("save.dat", "rb") as file_enc:
-        data = file_enc.read()
-    file_enc.close()
-    decrypted = bytes.decode(decrypt(data))
-    load_list = decrypted.split("\n")
-    load_list.pop(0)  # Pop first element Start
-    load_list.pop(-1)  # Pop last element blank character
-    return load_list
-
-
-def encrypt(file: bytes):
-    with open("game_key.key", "rb") as mykey:
-        key = mykey.read()
-    mykey.close()
-    fernet = Fernet(key)
-    encrypted = fernet.encrypt(file)
-    with open("save.dat", "wb") as encrypted_file:
-        encrypted_file.write(encrypted)
-    encrypted_file.close()
-
-
-def decrypt(file: bytes) -> bytes:
-    with open("game_key.key", "rb") as mykey:
-        key = mykey.read()
-    mykey.close()
-    fernet = Fernet(key)
-    original = fernet.decrypt(file)
-    return original
-
-
 class Player(arcade.Sprite):
     def __init__(self):
         super().__init__()
@@ -114,17 +65,17 @@ class Player(arcade.Sprite):
             print("Error loading player texture")
 
         # Loading idle, jump and fall texture
-        self.idle_texture_pair = load_texture_pair(f"{main_path}_idle.png")
-        self.jump_texture_pair = load_texture_pair(f"{main_path}_jump.png")
-        self.fall_texture_pair = load_texture_pair(f"{main_path}_fall.png")
+        self.idle_texture_pair = utils.load_texture_pair(f"{main_path}_idle.png")
+        self.jump_texture_pair = utils.load_texture_pair(f"{main_path}_jump.png")
+        self.fall_texture_pair = utils.load_texture_pair(f"{main_path}_fall.png")
         # Load a left facing texture and a right facing texture.
 
         # Load textures for walking
         self.walk_textures = []
-        texture = load_texture_pair(f"{main_path}_idle.png")
+        texture = utils.load_texture_pair(f"{main_path}_idle.png")
         self.walk_textures.append(texture)
         for i in range(1, 3):
-            texture = load_texture_pair(f"{main_path}_walk{i}.png")
+            texture = utils.load_texture_pair(f"{main_path}_walk{i}.png")
             self.walk_textures.append(texture)
 
         # Load textures for climbing
@@ -509,7 +460,7 @@ class GameView(arcade.View):
         )
         # After all base setup try load save.dat
         try:
-            save = load()
+            save = utils.load()
             self.player_sprite.set_position(float(save[0]), float(save[1]))
             self.level = int(save[2])
             self.lifes = int(save[3])
@@ -642,7 +593,7 @@ class GameView(arcade.View):
             save_list.append(self.coins)
             save_list.append(self.picked_coins_x)
             save_list.append(self.picked_coins_y)
-            save(save_list)
+            utils.save(save_list)
             self.window.show_view(esc_view)
 
         self.process_keychange()
