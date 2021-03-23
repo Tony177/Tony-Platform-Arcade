@@ -137,7 +137,7 @@ class Player(arcade.Sprite):
         self.texture = self.idle_texture_pair[0]
         self.set_hit_box(self.texture.hit_box_points)
 
-    def update_animation(self, delta_time: float = 1/60):
+    def update_animation(self, delta_time: float = 1 / 60):
 
         # Figure out if we need to flip face left or right
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
@@ -214,26 +214,43 @@ class PauseView(arcade.View):
 
     def on_draw(self):
         arcade.start_render()
-        
+
         self.resume.draw()
         self.plus_volume.draw()
         self.minus_volume.draw()
         self.exit.draw()
-        arcade.draw_text("Resume",self.resume.center_x-10.0, self.resume.center_y, arcade.csscolor.BLACK)
-        arcade.draw_text("Volume Up",self.plus_volume.center_x-10.0, self.plus_volume.center_y, arcade.csscolor.BLACK)
-        arcade.draw_text("Volume Down",self.minus_volume.center_x-10.0, self.minus_volume.center_y, arcade.csscolor.BLACK)
-        arcade.draw_text("Exit",self.exit.center_x-10.0, self.exit.center_y, arcade.csscolor.BLACK)
+        arcade.draw_text(
+            "Resume",
+            self.resume.center_x - 10.0,
+            self.resume.center_y,
+            arcade.csscolor.BLACK,
+        )
+        arcade.draw_text(
+            "Volume Up",
+            self.plus_volume.center_x - 10.0,
+            self.plus_volume.center_y,
+            arcade.csscolor.BLACK,
+        )
+        arcade.draw_text(
+            "Volume Down",
+            self.minus_volume.center_x - 10.0,
+            self.minus_volume.center_y,
+            arcade.csscolor.BLACK,
+        )
+        arcade.draw_text(
+            "Exit", self.exit.center_x - 10.0, self.exit.center_y, arcade.csscolor.BLACK
+        )
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global DEFAULT_VOLUME
-        if self.resume.collides_with_point((_x,_y)):
+        if self.resume.collides_with_point((_x, _y)):
             self.window.show_view(self.game)
 
-        if DEFAULT_VOLUME < 1 and self.plus_volume.collides_with_point((_x,_y)):
+        if DEFAULT_VOLUME < 1 and self.plus_volume.collides_with_point((_x, _y)):
             DEFAULT_VOLUME += 0.1
-        if DEFAULT_VOLUME > 0 and self.minus_volume.collides_with_point((_x,_y)):
+        if DEFAULT_VOLUME > 0 and self.minus_volume.collides_with_point((_x, _y)):
             DEFAULT_VOLUME -= 0.1
-        if self.exit.collides_with_point((_x,_y)):
+        if self.exit.collides_with_point((_x, _y)):
             # TO BE DONE: Save config file and data
             self.window.close()
 
@@ -378,7 +395,7 @@ class CharacterView(arcade.View):
         i = 0
         for sprite in self.sprites:
             # if check_box(sprite, _x, _y):
-            if sprite.collides_with_point((_x,_y)):
+            if sprite.collides_with_point((_x, _y)):
                 PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
                 game_view = GameView()
                 game_view.setup()
@@ -441,13 +458,12 @@ class GameView(arcade.View):
         # Spatial hash speed up collision detection but slow down movement
         # The player move often so don't use Spatial Hash
 
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True,)
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
         self.coin_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
         self.death_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
         self.background_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
 
         # Keep track of the score
-
 
         # Start background music
         self.media_player = self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
@@ -463,28 +479,28 @@ class GameView(arcade.View):
         platforms_layer_name = "Platforms"
         coins_layer_name = "Coins"
         death_layer_name = "Death"
-        background_layer_namer = "Background"
+        background_layer_name = "Background"
 
         # Read in the tiled map
         my_map = arcade.tilemap.read_tmx(map_name)
 
         # -- Platforms
         self.wall_list = arcade.tilemap.process_layer(
-            map_object=my_map,
-            layer_name=platforms_layer_name,
-            scaling=TILE_SCALING,
-            use_spatial_hash=True
+            my_map, platforms_layer_name, TILE_SCALING, use_spatial_hash=True
         )
 
         # -- Coins
         self.coin_list = arcade.tilemap.process_layer(
-            my_map, coins_layer_name, TILE_SCALING
+            my_map, coins_layer_name, TILE_SCALING, use_spatial_hash=True
         )
+        # -- Touch to die object
         self.death_list = arcade.tilemap.process_layer(
-            my_map, death_layer_name, TILE_SCALING
+            my_map, death_layer_name, TILE_SCALING, use_spatial_hash=True
         )
+
+        # -- Background and untouchable item
         self.background_list = arcade.process_layer(
-            my_map, background_layer_namer, TILE_SCALING
+            my_map, background_layer_name, TILE_SCALING, use_spatial_hash=True
         )
 
         # Create the 'physics engine'
@@ -526,8 +542,6 @@ class GameView(arcade.View):
             self.level = 1
             self.player_sprite.center_x = PLAYER_START_X
             self.player_sprite.center_y = PLAYER_START_Y
-            
-
 
     def on_hide_view(self):
         # When the view is changed do this
@@ -647,6 +661,7 @@ class GameView(arcade.View):
             self.right_pressed = False
 
         self.process_keychange()
+
     def boundary_check(self):
         changed = False
         # Scroll left
@@ -777,13 +792,13 @@ class GameView(arcade.View):
                 self.view_bottom,
                 SCREEN_HEIGHT + self.view_bottom,
             )
-        
+
 
 def main():
     os.chdir(
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
-    
+
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     star_view.setup()

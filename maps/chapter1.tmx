@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="118" height="40" tilewidth="128" tileheight="128" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="118" height="40" tilewidth="128" tileheight="128" infinite="0" nextlayerid="6" nextobjectid="1">
  <tileset firstgid="1" name="my_block" tilewidth="128" tileheight="128" tilecount="145" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="152">
@@ -519,14 +519,14 @@
    eJzt191OhDAQhmE48pbUxHs2rOvfRsN16YlMhGSyDjBAS215n2RCXCyOfLRbqgoAAAAAAAAAAAApfXV1U9v1nbo5ACjYqaun1E0AwAGVsv4+1Kk7AAC/UtZeIesvazBKU9IcRbmG9Zc1GLn77Krt6yNpJ3HcZjhHdSatc0x7Va9dNX29GOfbibFzFYsnK7325rQGS6Y6k0adO/XHx/6o90DNilo7dqm5DHLLaCkrU+99/M+5et0XmOtYpkfK9a7+LevzHE1lmnOuep/wrD4/j/w8rMXnyv5Ofxs5Dr+j94dy7t2oy0h/1t/zGrvGVKaxct0y3mN4Vvcw9CX7Q+/ef8lc0s/IpfprzZzy3MtQ1wqV656ZCt2bJ9sQ6+NUD3vn4el5zTX0+8nemYrr/nS28g4h7w/Du4M3U5mj1tycOx8i21TPh5D71Rq1d6bC6tGatzHmqbcf733dMu+t/2HN2JD34ki2ZrcknxDzHfHEfhakfgAZon53
   </data>
  </layer>
- <layer id="2" name="Coins" width="118" height="40" visible="0">
+ <layer id="2" name="Coins" width="118" height="40">
   <data encoding="base64" compression="zlib">
-   eJzt1kEKgCAQBVA9WXWBFl27S1WLFoXMLmzqPZABRfmzUUsBAAAAAAAAAACestTeCQAAAAByGWu7ZhBlzdQHQDbHHXuOyHxbb+2L3qHW+cM+N9VrBfiit/9n194BAIDf2gB62wbC
+   eJzt1jEKwCAMAED9WV/Qod/upzp1qIhIi2jKHYiDRBKHxJQAAAAAAAAAAIBRjjw7AwAAAOCLLT8X493vXO4RtHKNVAdANL2zei/Oa3GtOVS7v/wr6PfAX63e384XMT01rV43ADDfBVL2CEk=
   </data>
  </layer>
  <layer id="3" name="Background" width="118" height="40">
   <data encoding="base64" compression="zlib">
-   eJzt0bEJACAQA0D338ApBCdwKXsbKxd4CXeQ4qs8pDUAAAAAAAAAAAAAAACATOuGLPOGLHbNVLnrKOoFgN/t5+4lXwBAhgNxUgfq
+   eJzt17EJwDAMBEDvv4GnCGQC7xTSu3GVBV4Rd/C1Hr7SGAAAAAAAwN896QIAAAAAAABQ0JsuQAnrhF7uE3qxa0/JXa/QXQCo7vsvz0gLAOhhA031CdI=
   </data>
  </layer>
  <layer id="4" name="Death" width="118" height="40">
