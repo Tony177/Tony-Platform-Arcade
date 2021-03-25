@@ -39,6 +39,7 @@ TOP_VIEWPORT_MARGIN = 300
 RIGHT_FACING = 0
 LEFT_FACING = 1
 
+
 class Player(arcade.Sprite):
     def __init__(self):
         super().__init__()
@@ -202,7 +203,8 @@ class PauseView(arcade.View):
         if DEFAULT_VOLUME > 0 and self.minus_volume.collides_with_point((_x, _y)):
             DEFAULT_VOLUME -= 0.1
         if self.exit.collides_with_point((_x, _y)):
-            # TO BE DONE: Save config file and data
+            # Saving Data
+            self.game.save_data()
             self.window.close()
 
 
@@ -460,32 +462,7 @@ class GameView(arcade.View):
         )
         # After all base setup try load save.dat
         try:
-            save = utils.load()
-            self.player_sprite.set_position(float(save[0]), float(save[1]))
-            self.level = int(save[2])
-            self.lifes = int(save[3])
-            self.coins = int(save[4])
-            # Removed comma from x coordinate list
-            coins_to_remove_x = save[5].split(",")
-            # Removed first square bracket
-            coins_to_remove_x[0] = coins_to_remove_x[0].split("[")[1]
-            # Removed last square bracket
-            coins_to_remove_x[-1] = coins_to_remove_x[-1].split("]")[0]
-            # Removed comma from y coordinate list
-            coins_to_remove_y = save[6].split(",")
-            # Removed first square bracket
-            coins_to_remove_y[0] = coins_to_remove_y[0].split("[")[1]
-            # Removed last square bracket
-            coins_to_remove_y[-1] = coins_to_remove_y[-1].split("]")[0]
-            if coins_to_remove_x: # Check empty list
-                for c in self.coin_list:
-                    for i in range(len(coins_to_remove_x)):
-                        if c.center_x == float(coins_to_remove_x[i]):
-                            if c.center_y == float(coins_to_remove_y[i]):
-                                c.remove_from_sprite_lists()
-                                coins_to_remove_y.pop(i)
-                                coins_to_remove_x.pop(i)
-                                break
+            self.load_data()
         except FileNotFoundError:
             # If not found any save file set initial value
             self.coins = 0
@@ -585,15 +562,6 @@ class GameView(arcade.View):
             # Load Pause Menu
             esc_view = PauseView(self)
             esc_view.setup()
-            save_list = []
-            save_list.append(self.player_sprite.center_x)
-            save_list.append(self.player_sprite.center_y)
-            save_list.append(self.level)
-            save_list.append(self.lifes)
-            save_list.append(self.coins)
-            save_list.append(self.picked_coins_x)
-            save_list.append(self.picked_coins_y)
-            utils.save(save_list)
             self.window.show_view(esc_view)
 
         self.process_keychange()
@@ -743,6 +711,52 @@ class GameView(arcade.View):
                 self.view_bottom,
                 SCREEN_HEIGHT + self.view_bottom,
             )
+
+    def save_data(self):
+        save_list = []
+        save_list.append(self.player_sprite.center_x)
+        save_list.append(self.player_sprite.center_y)
+        save_list.append(self.level)
+        save_list.append(self.lifes)
+        save_list.append(self.coins)
+        save_list.append(self.picked_coins_x)
+        save_list.append(self.picked_coins_y)
+        utils.save(save_list)
+
+    def load_data(self):
+        save = utils.load()
+        self.player_sprite.set_position(float(save[0]), float(save[1]))
+        self.level = int(save[2])
+        self.lifes = int(save[3])
+        self.coins = int(save[4])
+        # Removed comma from x coordinate list
+        coins_to_remove_x = save[5].split(",")
+        # Removed first square bracket
+        coins_to_remove_x[0] = coins_to_remove_x[0].split("[")[1]
+        # Removed last square bracket
+        coins_to_remove_x[-1] = coins_to_remove_x[-1].split("]")[0]
+        # Removed comma from y coordinate list
+        coins_to_remove_y = save[6].split(",")
+        # Removed first square bracket
+        coins_to_remove_y[0] = coins_to_remove_y[0].split("[")[1]
+        # Removed last square bracket
+        coins_to_remove_y[-1] = coins_to_remove_y[-1].split("]")[0]
+        if coins_to_remove_x:  # Check empty list
+            for to_remove in coins_to_remove_x:
+                if to_remove:
+                    self.picked_coins_x.append(float(to_remove))
+            for to_remove in coins_to_remove_y:
+                if to_remove:
+                    self.picked_coins_y.append(float(to_remove))
+            for c in self.coin_list:
+                for i in range(len(coins_to_remove_x)):
+                    if coins_to_remove_x[i]:  # Verify if is not blank
+                        if c.center_x == float(coins_to_remove_x[i]):
+                            if c.center_y == float(coins_to_remove_y[i]):
+                                c.remove_from_sprite_lists()
+                                coins_to_remove_y.pop(i)
+                                coins_to_remove_x.pop(i)
+                                break  # Useless to check other times alredy removed coin
 
 
 def main():
