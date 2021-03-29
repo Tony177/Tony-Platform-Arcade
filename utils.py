@@ -1,6 +1,7 @@
-
 from cryptography.fernet import Fernet
 from arcade import load_texture
+
+
 def load_texture_pair(filename):
 
     return [
@@ -49,8 +50,6 @@ def decrypt(file: bytes) -> bytes:
     original = fernet.decrypt(file)
     return original
 
-if __name__ == "__main__":
-    main()
 
-def main():
+if __name__ == "__main__":
     pass

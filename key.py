@@ -1,8 +1,8 @@
 from cryptography.fernet import Fernet
 
-key = Fernet.generate_key() # Generating Key
+key = Fernet.generate_key()  # Generating Key
 
-with open('game_key.key', 'wb') as mykey:
+with open("game_key.key", "wb") as mykey:
     mykey.write(key)
 
 # If you want to open and read the key file
