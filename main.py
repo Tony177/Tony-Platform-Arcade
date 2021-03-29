@@ -348,7 +348,8 @@ class CharacterView(arcade.View):
         for sprite in self.sprites:
             # if check_box(sprite, _x, _y):
             if sprite.collides_with_point((_x, _y)):
-                PLAYER_SPRITE = i  # Selected the index of the character defined near PLAYER_SPRITE definition
+                # Selected the index of the character defined near PLAYER_SPRITE definition
+                PLAYER_SPRITE = i
                 game_view = GameView()
                 game_view.setup()
                 self.window.show_view(game_view)
@@ -541,18 +542,18 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
-    def on_key_press(self, key, modifiers):
-        # Called when a key is pressed
+    def on_key_press(self, simbol, modifiers):
+        # Called when a key (simbol) is pressed
 
-        if key in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
+        if simbol in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
             self.up_pressed = True
-        elif key in (arcade.key.DOWN, arcade.key.S):
+        elif simbol in (arcade.key.DOWN, arcade.key.S):
             self.down_pressed = True
-        elif key in (arcade.key.LEFT, arcade.key.A):
+        elif simbol in (arcade.key.LEFT, arcade.key.A):
             self.left_pressed = True
-        elif key in (arcade.key.RIGHT, arcade.key.D):
+        elif simbol in (arcade.key.RIGHT, arcade.key.D):
             self.right_pressed = True
-        elif key == arcade.key.ESCAPE:
+        elif simbol == arcade.key.ESCAPE:
             # To avoid movement bug set all previous keys to False
             self.up_pressed = False
             self.down_pressed = False
@@ -565,17 +566,17 @@ class GameView(arcade.View):
 
         self.process_keychange()
 
-    def on_key_release(self, key, modifiers):
-        # Called when a key is released
+    def on_key_release(self, simbol, modifiers):
+        # Called when a key (simbol) is released
 
-        if key in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
+        if simbol in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
             self.up_pressed = False
             self.jump_needs_reset = False
-        elif key in (arcade.key.DOWN, arcade.key.S):
+        elif simbol in (arcade.key.DOWN, arcade.key.S):
             self.down_pressed = False
-        elif key in (arcade.key.LEFT, arcade.key.A):
+        elif simbol in (arcade.key.LEFT, arcade.key.A):
             self.left_pressed = False
-        elif key in (arcade.key.RIGHT, arcade.key.D):
+        elif simbol in (arcade.key.RIGHT, arcade.key.D):
             self.right_pressed = False
 
         self.process_keychange()
@@ -748,14 +749,16 @@ class GameView(arcade.View):
                 if to_remove:
                     self.picked_coins_y.append(float(to_remove))
             for c in self.coin_list:
-                for i in range(len(coins_to_remove_x)):
+                for i in range(len(coins_to_remove_x)):                        
                     if coins_to_remove_x[i]:  # Verify if is not blank
-                        if c.center_x == float(coins_to_remove_x[i]):
-                            if c.center_y == float(coins_to_remove_y[i]):
-                                c.remove_from_sprite_lists()
-                                coins_to_remove_y.pop(i)
-                                coins_to_remove_x.pop(i)
-                                break  # Useless to check other times alredy removed coin
+                       if c.center_x == float(
+                            coins_to_remove_x[i]
+                        ) and c.center_y == float(coins_to_remove_y[i]):
+                            self.coin_list.remove(c)
+                            coins_to_remove_y.pop(i)
+                            coins_to_remove_x.pop(i)
+                            # Useless to check other times alredy removed coin
+                            break
 
 
 def main():
