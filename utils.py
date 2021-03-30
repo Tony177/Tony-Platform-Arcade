@@ -49,7 +49,3 @@ def decrypt(file: bytes) -> bytes:
     fernet = Fernet(key)
     original = fernet.decrypt(file)
     return original
-
-
-if __name__ == "__main__":
-    pass

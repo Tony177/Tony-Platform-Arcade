@@ -522,9 +522,12 @@ class GameView(arcade.View):
                 self.player_sprite.change_y = PLAYER_JUMP_SPEED
                 self.jump_needs_reset = True
                 arcade.play_sound(self.jump_sound, DEFAULT_VOLUME)
-        elif self.down_pressed and not self.up_pressed:
-            if self.physics_engine.is_on_ladder():
-                self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+        elif (
+            self.down_pressed
+            and not self.up_pressed
+            and self.physics_engine.is_on_ladder()
+        ):
+            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
 
         # Process up/down when on a ladder and no movement
         if self.physics_engine.is_on_ladder():
@@ -541,7 +544,7 @@ class GameView(arcade.View):
         else:
             self.player_sprite.change_x = 0
 
-    def on_key_press(self, key: int, modifiers: int):
+    def on_key_press(self, key: int, _modifiers: int):
         # Called when a key is pressed
 
         if key in (arcade.key.UP, arcade.key.W, arcade.key.SPACE):
@@ -749,15 +752,17 @@ class GameView(arcade.View):
                     self.picked_coins_y.append(float(to_remove))
             for c in self.coin_list:
                 for i in range(len(coins_to_remove_x)):
-                    if coins_to_remove_x[i]:  # Verify if is not blank
-                        if c.center_x == float(
-                            coins_to_remove_x[i]
-                        ) and c.center_y == float(coins_to_remove_y[i]):
-                            self.coin_list.remove(c)
-                            coins_to_remove_y.pop(i)
-                            coins_to_remove_x.pop(i)
-                            # Useless to check other times alredy removed coin
-                            break
+                    # Verify if is not blank
+                    if (
+                        coins_to_remove_x[i]
+                        and c.center_x == float(coins_to_remove_x[i])
+                        and c.center_y == float(coins_to_remove_y[i])
+                    ):
+                        self.coin_list.remove(c)
+                        coins_to_remove_y.pop(i)
+                        coins_to_remove_x.pop(i)
+                        # Useless to check other times alredy removed coin
+                        break
 
 
 def main():
