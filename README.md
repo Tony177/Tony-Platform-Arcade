@@ -1,3 +1,4 @@
+[![DeepSource](https://deepsource.io/gh/Tony177/Tony-Platform-Arcade.svg/?label=resolved+issues&show_trend=true)](https://deepsource.io/gh/Tony177/Tony-Platform-Arcade/?ref=repository-badge)
 # Tony177's Platform Arcade
 Simple platform game created for educational and learning purpose.
 
@@ -14,8 +15,8 @@ If you lose all the lifes you've lost the game\
 Click with the mouse to start character selection\
 Click on one of the four image to select a character\
 You save the game every time you leave the game from Pause Menu
-## Structure of the game
 
+## Structure of the game
 Game's Feature to implement/implemented:
 - Movement and Physics Engine :heavy_check_mark:
 - First chapter (still uncomplete):heavy_check_mark:
