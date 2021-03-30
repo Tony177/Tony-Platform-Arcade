@@ -2,9 +2,11 @@ from cryptography.fernet import Fernet
 
 '''
     Stub function to understand how to use Fernet's Cryptography Module
-    
+
     (This file can't be used as standalone program)
 '''
+
+
 def main():
     key = Fernet.generate_key()  # Generating Key
 
