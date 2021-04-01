@@ -476,10 +476,11 @@ class GameView(arcade.View):
 
     def on_draw(self):
         # Render the game
+        global SCREEN_WIDTH, SCREEN_HEIGHT
+        [SCREEN_WIDTH, SCREEN_HEIGHT]=self.window.get_size()
         self.backgroud_sound.set_volume(DEFAULT_VOLUME, self.media_player)
         self.media_player.play()
         arcade.set_background_color(arcade.csscolor.SKY_BLUE)
-
         arcade.start_render()
         self.window.set_mouse_visible(False)
 
@@ -770,7 +771,7 @@ def main():
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
 
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
     star_view = StartingView()
     window.show_view(star_view)
     arcade.run()
