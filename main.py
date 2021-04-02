@@ -198,9 +198,9 @@ class PauseView(arcade.View):
         if self.resume.collides_with_point((_x, _y)):
             self.window.show_view(self.game)
 
-        if DEFAULT_VOLUME < 1 and self.plus_volume.collides_with_point((_x, _y)):
+        if DEFAULT_VOLUME < 0.9 and self.plus_volume.collides_with_point((_x, _y)):
             DEFAULT_VOLUME += 0.1
-        if DEFAULT_VOLUME > 0 and self.minus_volume.collides_with_point((_x, _y)):
+        if DEFAULT_VOLUME > 0.1 and self.minus_volume.collides_with_point((_x, _y)):
             DEFAULT_VOLUME -= 0.1
         if self.exit.collides_with_point((_x, _y)):
             # Saving Data
@@ -476,8 +476,6 @@ class GameView(arcade.View):
 
     def on_draw(self):
         # Render the game
-        global SCREEN_WIDTH, SCREEN_HEIGHT
-        [SCREEN_WIDTH, SCREEN_HEIGHT]=self.window.get_size()
         self.backgroud_sound.set_volume(DEFAULT_VOLUME, self.media_player)
         self.media_player.play()
         arcade.set_background_color(arcade.csscolor.SKY_BLUE)
@@ -770,8 +768,7 @@ def main():
     os.chdir(
         os.path.dirname(os.path.realpath(__file__))
     )  # Change working directory to this file's directory
-
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=True)
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     window.show_view(star_view)
     arcade.run()
