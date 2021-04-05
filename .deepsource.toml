@@ -1,6 +1,6 @@
 version = 1
 
-exclude_patterns = [
+test_patterns = [
     "/images/*",
     "/sounds/*",
     "/musics/*",
@@ -14,3 +14,11 @@ enabled = true
 
   [analyzers.meta]
   runtime_version = "3.x.x"
+
+[[analyzers]]
+name = "secrets"
+enabled = true
+
+[[transformers]]
+name = "black"
+enabled = true
