@@ -60,7 +60,7 @@ def encrypt(file: bytes) -> bytes:
     ----------
     file : bytes
         The alredy open file as bytes not crypted
-    
+
     Returns
     -------
     bytes
@@ -83,7 +83,7 @@ def decrypt(file: bytes) -> bytes:
     ----------
     file : bytes
         The alredy open file as bytes crypted
-    
+
     Returns
     -------
     bytes
