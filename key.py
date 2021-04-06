@@ -14,7 +14,7 @@ def main():
         mykey.write(key)
 
     # If you want to open and read the key file
-    with open('game_key.key', 'rb') as mykey:
+    with open("game_key.key", "rb") as mykey:
         key = mykey.read()
 
 
