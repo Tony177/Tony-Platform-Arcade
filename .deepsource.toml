@@ -1,13 +1,5 @@
 version = 1
 
-test_patterns = [
-    "/images/*",
-    "/sounds/*",
-    "/musics/*",
-    "*.key",
-    "*.dat"
-]
-
 [[analyzers]]
 name = "python"
 enabled = true
@@ -15,10 +7,6 @@ enabled = true
   [analyzers.meta]
   runtime_version = "3.x.x"
 
-[[analyzers]]
-name = "secrets"
-enabled = true
-
 [[transformers]]
-name = "black"
+name = "prettier"
 enabled = true
