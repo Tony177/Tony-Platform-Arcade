@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Author : Tony177
 
 import arcade
@@ -765,9 +766,8 @@ class GameView(arcade.View):
 
 
 def main():
-    os.chdir(
-        os.path.dirname(os.path.realpath(__file__))
-    )  # Change working directory to this file's directory
+    # Change working directory to this file's directory
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     star_view = StartingView()
     window.show_view(star_view)
