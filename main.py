@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Author : Tony177
 
 import arcade
@@ -67,9 +67,12 @@ class Player(arcade.Sprite):
             print("Error loading player texture")
 
         # Loading idle, jump and fall texture
-        self.idle_texture_pair = utils.load_texture_pair(f"{main_path}_idle.png")
-        self.jump_texture_pair = utils.load_texture_pair(f"{main_path}_jump.png")
-        self.fall_texture_pair = utils.load_texture_pair(f"{main_path}_fall.png")
+        self.idle_texture_pair = utils.load_texture_pair(
+            f"{main_path}_idle.png")
+        self.jump_texture_pair = utils.load_texture_pair(
+            f"{main_path}_jump.png")
+        self.fall_texture_pair = utils.load_texture_pair(
+            f"{main_path}_fall.png")
         # Load a left facing texture and a right facing texture.
 
         # Load textures for walking
@@ -338,10 +341,14 @@ class CharacterView(arcade.View):
             sprite_y.append(x.bottom - 100)
 
         # Text written under every character sprite
-        arcade.draw_text("Male", sprite_x[0], sprite_y[0], arcade.csscolor.WHITE, 64)
-        arcade.draw_text("Female", sprite_x[1], sprite_y[1], arcade.csscolor.WHITE, 64)
-        arcade.draw_text("Zombie", sprite_x[2], sprite_y[2], arcade.csscolor.WHITE, 64)
-        arcade.draw_text("Soldier", sprite_x[3], sprite_y[3], arcade.csscolor.WHITE, 64)
+        arcade.draw_text(
+            "Male", sprite_x[0], sprite_y[0], arcade.csscolor.WHITE, 64)
+        arcade.draw_text(
+            "Female", sprite_x[1], sprite_y[1], arcade.csscolor.WHITE, 64)
+        arcade.draw_text(
+            "Zombie", sprite_x[2], sprite_y[2], arcade.csscolor.WHITE, 64)
+        arcade.draw_text(
+            "Soldier", sprite_x[3], sprite_y[3], arcade.csscolor.WHITE, 64)
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         global PLAYER_SPRITE  # To modify global variable player_sprite
@@ -411,15 +418,20 @@ class GameView(arcade.View):
         # Spatial hash speed up collision detection but slow down movement
         # The player move often so don't use Spatial Hash
 
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
-        self.coin_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
-        self.death_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
-        self.background_list = arcade.SpriteList(use_spatial_hash=True, is_static=True)
+        self.wall_list = arcade.SpriteList(
+            use_spatial_hash=True, is_static=True)
+        self.coin_list = arcade.SpriteList(
+            use_spatial_hash=True, is_static=True)
+        self.death_list = arcade.SpriteList(
+            use_spatial_hash=True, is_static=True)
+        self.background_list = arcade.SpriteList(
+            use_spatial_hash=True, is_static=True)
 
         # Keep track of the score
 
         # Start background music
-        self.media_player = self.backgroud_sound.play(volume=DEFAULT_VOLUME, loop=True)
+        self.media_player = self.backgroud_sound.play(
+            volume=DEFAULT_VOLUME, loop=True)
 
         # Set up the player
         self.player_list = arcade.SpriteList()
@@ -681,7 +693,8 @@ class GameView(arcade.View):
         changed = False
 
         if (
-            arcade.check_for_collision_with_list(self.player_sprite, self.death_list)
+            arcade.check_for_collision_with_list(
+                self.player_sprite, self.death_list)
             or self.player_sprite.center_y < -100
         ):
             self.lifes -= 1
