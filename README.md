@@ -1,6 +1,7 @@
 [![DeepSource](https://deepsource.io/gh/Tony177/Tony-Platform-Arcade.svg/?label=resolved+issues&show_trend=true)](https://deepsource.io/gh/Tony177/Tony-Platform-Arcade/?ref=repository-badge)
 
 # PROJECT STOPPED
+
 Dropped the project due to radical change into arcade API, which caused deprecated functionality.
 
 # Tony177's Platform Arcade
